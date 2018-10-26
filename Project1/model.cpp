@@ -82,13 +82,14 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 				isLoaded = true;
 			}
 		}
-		if (isLoaded)
+		if (!isLoaded)
 		{
 			Texture texture;
-			texture.ID = loadTexture(str.C_Str(),directory);
+			texture.ID = loadTexture(str.C_Str(), directory);
 			texture.type = type;
 			texture.path = str.C_Str();
 			textures.push_back(texture);
+			loadedTextures.push_back(texture);
 		}
 	}
 	return textures;
@@ -103,8 +104,7 @@ unsigned loadTexture(const char *filePath, const std::string directory)
 	glGenTextures(1, &texture);
 
 	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(filePath, &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, 0);
 
 	if (data)
 	{
@@ -131,6 +131,15 @@ unsigned loadTexture(const char *filePath, const std::string directory)
 	{
 		std::cout << "Failed to load texture : " << filePath << "\n" << std::endl;
 	}
-
 	stbi_image_free(data);
+
+	return texture;
+}
+
+void Model::draw(Shader &shader)
+{
+	for (auto &i : meshes)
+	{
+		i.draw(shader);
+	}
 }

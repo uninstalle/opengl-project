@@ -18,7 +18,6 @@ void Mesh::setupMesh()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Normal)));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
 
-
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
@@ -26,7 +25,7 @@ void Mesh::setupMesh()
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader shader)
+void Mesh::draw(Shader &shader)
 {
 	unsigned diffuse = 0;
 	unsigned specular = 0;
@@ -48,6 +47,7 @@ void Mesh::draw(Shader shader)
 
 		glBindTexture(GL_TEXTURE_2D, textures[i].ID);
 	}
+	glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), 32.0f);
 	glActiveTexture(0);
 
 	glBindVertexArray(VAO);

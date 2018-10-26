@@ -19,7 +19,7 @@ public:
 	{
 		loadModel(path);
 	}
-	void draw(Shader shader);
+	void draw(Shader &shader);
 };
 
 unsigned loadTexture(const char *filePath, const std::string directory);

@@ -14,11 +14,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-constexpr float SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
+constexpr float SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
 GLFWwindow *Window = nullptr;
 
 float deltaTime = 0, lastFrame = 0;
-float lastX = 400, lastY = 300;
+float lastX = 960, lastY = 540;
 
 int isSpotLightOn = 0;
 
@@ -26,7 +26,6 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 GLFWwindow* initGLFWWindow();
 void initGLAD();
-void loadTexture(const GLchar *filePath, unsigned textureSlot);
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -104,27 +103,15 @@ int main()
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
-	glm::vec3 cubePositions[] = {
-  glm::vec3(0.0f,  1.0f,  2.0f),
-  glm::vec3(2.0f,  5.0f, -15.0f)
-	};
 
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
 
-	TrianglePatternTextured box;
-	box.loadPattern(vertices, sizeof(vertices));
-
 	Shader shaderProgram("VertexShader.glsl", "FragmentShader.glsl");
 
-	loadTexture("resource/YJSP.jpg", GL_TEXTURE0);
-	loadTexture("resource/YJSP_spe.jpg", GL_TEXTURE1);
-
+	Model nanosuitModel("resource/nanosuit/nanosuit.obj");
 	shaderProgram.activate();
-	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "material.diffuse"), 0);
-	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "material.specular"), 1);
-	glUniform1f(glGetUniformLocation(shaderProgram.getID(), "material.shininess"), 32.0f);
 
 	DirLight dirL(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.5f, 0.5f, 0.5f));
 	PointLight poiL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -138,7 +125,7 @@ int main()
 
 	Shader lightShaderProgram("VertexShader.glsl", "LightFragmentShader.glsl");
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -165,6 +152,7 @@ int main()
 		lightShaderProgram.setMat4f(lightModel, "model");
 		lightSource.drawPattern();
 
+
 		shaderProgram.activate();
 		shaderProgram.setMat4f(view, "view");
 		shaderProgram.setMat4f(projection, "projection");
@@ -177,16 +165,11 @@ int main()
 		spoL.apply(shaderProgram);
 		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"),  isSpotLightOn);
 
+		glm::mat4 model(1.0f);
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		shaderProgram.setMat4f(model, "model");
 
-		for (int i = 0; i != 2; ++i)
-		{
-			glm::mat4 model(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			shaderProgram.setMat4f(model, "model");
-			box.drawPattern();
-		}
-
-
+		nanosuitModel.draw(shaderProgram);
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
@@ -223,6 +206,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
+
 void processInput(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -260,44 +244,6 @@ void processInput(GLFWwindow *window)
 		isSpotLightOn = isSpotLightOn == 0 ? 1 : 0;
 	}
 }
-void loadTexture(const GLchar *filePath, unsigned textureSlot)
-{
-
-	unsigned texture;
-	glGenTextures(1, &texture);
-
-	glActiveTexture(textureSlot);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(filePath, &width, &height, &nrChannels, 0);
-
-	if (data)
-	{
-		GLenum format;
-		if (nrChannels == 1)
-			format = GL_RED;
-		else if (nrChannels == 3)
-			format = GL_RGB;
-		else if (nrChannels == 4)
-			format = GL_RGBA;
-		else
-			throw std::runtime_error("nrChannels error.\n");
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture : " << filePath << "\n" << std::endl;
-	}
-	stbi_image_free(data);
-}
-
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 {
