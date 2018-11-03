@@ -68,7 +68,7 @@ void main()
 	vec3 result = CalDirLight(dirLight, normal, viewDir);
 	for (int i = 0; i < PointLightNum; i++)
 		result += CalPointLight(pointLight[i], normal, fragPos, viewDir);
-	if (isSpotLightOn==1)
+	if (isSpotLightOn == 1)
 		result += CalSpotLight(spotLight, normal, fragPos, viewDir);
 
 	FragColor = vec4(result, 1.0);

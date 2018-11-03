@@ -60,47 +60,47 @@ int main()
 
 
 	float vertices[] = {
-	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 
 
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
 
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  
 
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
 
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
 	};
 
 
@@ -110,8 +110,6 @@ int main()
 
 	Shader shaderProgram("VertexShader.glsl", "FragmentShader.glsl");
 
-	Model nanosuitModel("resource/nanosuit/nanosuit.obj");
-	shaderProgram.activate();
 
 	DirLight dirL(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.5f, 0.5f, 0.5f));
 	PointLight poiL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -120,7 +118,7 @@ int main()
 		1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
 
-	TrianglePatternTextured lightSource;
+	TrianglePattern lightSource;
 	lightSource.loadPattern(vertices, sizeof(vertices));
 
 	Shader lightShaderProgram("VertexShader.glsl", "LightFragmentShader.glsl");
@@ -128,7 +126,6 @@ int main()
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	while (!glfwWindowShouldClose(Window))
 	{
@@ -152,7 +149,6 @@ int main()
 		lightShaderProgram.setMat4f(lightModel, "model");
 		lightSource.drawPattern();
 
-
 		shaderProgram.activate();
 		shaderProgram.setMat4f(view, "view");
 		shaderProgram.setMat4f(projection, "projection");
@@ -169,7 +165,6 @@ int main()
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		shaderProgram.setMat4f(model, "model");
 
-		nanosuitModel.draw(shaderProgram);
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();

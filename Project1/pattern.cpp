@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 void TrianglePattern::loadPattern(float* vertices, int verticesArraySize)
 {
@@ -58,24 +59,4 @@ void TrianglePattern::drawPattern(unsigned *indexArray, int indexArraySize)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_ID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArraySize, indexArray, GL_STATIC_DRAW);
 	glDrawElements(GL_TRIANGLES, indexArraySize / sizeof(int), GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
-}
-
-void TrianglePatternTextured::initializePattern()
-{
-	glGenVertexArrays(1, &VAO_ID);
-	glBindVertexArray(VAO_ID);
-
-	glGenBuffers(1, &VBO_ID);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_ID);
-	glBufferData(GL_ARRAY_BUFFER, verticesArraySize, vertices, GL_STATIC_DRAW);
-
-	//position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(0));
-	glEnableVertexAttribArray(0);
-	//normal
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	//tex coord
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 }
