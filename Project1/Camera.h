@@ -1,102 +1,77 @@
 #pragma once
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
-enum CameraMovement
+struct CameraMovement
 {
-	FORWARD, BACKWARD, LEFT, RIGHT
+	enum
+	{
+		FORWARD = 1,
+		BACKWARD = 2,
+		LEFT_SHIFT = 4,
+		RIGHT_SHIFT = 8,
+		LEFT_ROLL = 16,
+		RIGHT_ROLL = 32
+	};
+	unsigned Movement = 0;
 };
 
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
-const float SPEED = 1.5f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+
+
+void synchronizeMovementSpeed();
+
 
 class Camera
 {
 private:
-	void updateCameraVectors()
-	{
-		glm::vec3 front;
-		front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-		front.y = sin(glm::radians(Pitch));
-		front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-		Front = glm::normalize(front);
-		Right = glm::normalize(glm::cross(Front, WorldUp));
-		Up = glm::normalize(glm::cross(Right, Front));
-	}
+
+	glm::vec3 position;
+	glm::vec3 front;
+	glm::vec3 up;
+	glm::vec3 right;
+	glm::vec3 worldUp;
+	float yaw;
+	float pitch;
+	float movementSpeed;
+	float mouseSensitivity;
+	float zoom;
+
+	static constexpr float DefaultYaw = -90.0f;
+	static constexpr float DefaultPitch = 0.0f;
+	static constexpr float DefaultSpeed = 1.5f;
+	static constexpr float DefaultSensitivity = 0.1f;
+	static constexpr float DefaultZoom = 45.0f;
+
+	void updateCameraVectors();
 public:
-	float Yaw;
-	float Pitch;
-	float MovementSpeed;
-	float MouseSensitivity;
-	float Zoom;
-	glm::vec3 Position;
-	glm::vec3 Front;
-	glm::vec3 Up;
-	glm::vec3 Right;
-	glm::vec3 WorldUp;
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) 
-	: Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = DefaultYaw, float pitch = DefaultPitch) 
+	: position(position), front(glm::vec3(0.0f, 0.0f, -1.0f)), up(up),yaw(yaw),pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
-		Position = position;
-		WorldUp = up;
-		Yaw = yaw;
-		Pitch = pitch;
 		updateCameraVectors();
 	}
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) 
-	: Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+	: position(glm::vec3(posX, posY, posZ)), front(glm::vec3(0.0f, 0.0f, -1.0f)), up(glm::vec3(upX, upY, upZ)), yaw(yaw), pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
-		Position = glm::vec3(posX, posY, posZ);
-		WorldUp = glm::vec3(upX, upY, upZ);
-		Yaw = yaw;
-		Pitch = pitch;
 		updateCameraVectors();
 	}
-	glm::mat4 GetViewMatrix()
+	glm::mat4 GetViewMatrix() const;
+	glm::vec3 getPosition() const
 	{
-		return glm::lookAt(Position, Position + Front, Up);
+		return position;
 	}
-	void ProcessKeyboard(CameraMovement direction, float deltaTime)
+	glm::vec3 getFront() const
 	{
-		float velocity = MovementSpeed * deltaTime;
-		if (direction == FORWARD)
-			Position += Front * velocity;
-		if (direction == BACKWARD)
-			Position -= Front * velocity;
-		if (direction == LEFT)
-			Position -= Right * velocity;
-		if (direction == RIGHT)
-			Position += Right * velocity;
+		return front;
 	}
-	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true)
+	glm::vec3 getUp() const
 	{
-		xoffset *= MouseSensitivity;
-		yoffset *= MouseSensitivity;
-
-		Yaw += xoffset;
-		Pitch += yoffset;
-
-		if (constrainPitch)
-		{
-			if (Pitch > 89.0f)
-				Pitch = 89.0f;
-			if (Pitch < -89.0f)
-				Pitch = -89.0f;
-		}
-
-		updateCameraVectors();
+		return up;
 	}
-	void ProcessMouseScroll(float yoffset)
+	float getZoom() const
 	{
-		if (Zoom >= 1.0f && Zoom <= 45.0f)
-			Zoom -= yoffset;
-		if (Zoom <= 1.0f)
-			Zoom = 1.0f;
-		if (Zoom >= 45.0f)
-			Zoom = 45.0f;
+		return zoom;
 	}
+	void processKeyboardMovement(CameraMovement direction);
+	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+	void processMouseScroll(float yoffset);
 };

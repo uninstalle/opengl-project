@@ -3,13 +3,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Shader.h"
-#include "Camera.h"
+#include "shader.h"
+#include "camera.h"
 #include "pattern.h"
 #include "light.h"
 #include "model.h"
 
-#include <stb-master/stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,8 +16,7 @@
 constexpr float SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
 GLFWwindow *Window = nullptr;
 
-float deltaTime = 0, lastFrame = 0;
-float lastX = 960, lastY = 540;
+float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2;
 
 int isSpotLightOn = 0;
 
@@ -31,6 +29,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void processCameraMovement(GLFWwindow *window);
 
 
 int main()
@@ -105,7 +104,7 @@ int main()
 
 
 	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
 
 	Shader shaderProgram("VertexShader.glsl", "FragmentShader.glsl");
@@ -131,11 +130,10 @@ int main()
 	{
 		//inputting
 		processInput(Window);
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		synchronizeMovementSpeed();
+
 		view = camera.GetViewMatrix();
-		projection = glm::perspective(glm::radians(camera.Zoom), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightShaderProgram.activate();
@@ -152,10 +150,10 @@ int main()
 		shaderProgram.activate();
 		shaderProgram.setMat4f(view, "view");
 		shaderProgram.setMat4f(projection, "projection");
-		shaderProgram.setVec3f(camera.Position, "viewPos");
+		shaderProgram.setVec3f(camera.getPosition(), "viewPos");
 		poiL.setPosition(lightTrans);
-		spoL.setPosition(camera.Position);
-		spoL.setDirection(camera.Front);
+		spoL.setPosition(camera.getPosition());
+		spoL.setDirection(camera.getFront());
 		dirL.apply(shaderProgram);
 		poiL.apply(shaderProgram);
 		spoL.apply(shaderProgram);
@@ -206,27 +204,8 @@ void processInput(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	CameraMovement direction;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		direction = FORWARD;
-		camera.ProcessKeyboard(direction, deltaTime);
-	}
-	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		direction = BACKWARD;
-		camera.ProcessKeyboard(direction, deltaTime);
-	}
-	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		direction = LEFT;
-		camera.ProcessKeyboard(direction, deltaTime);
-	}
-	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		direction = RIGHT;
-		camera.ProcessKeyboard(direction, deltaTime);
-	}
+
+	processCameraMovement(window);
 
 	static bool isZpressed = false;
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
@@ -238,6 +217,38 @@ void processInput(GLFWwindow *window)
 		isZpressed = false;
 		isSpotLightOn = isSpotLightOn == 0 ? 1 : 0;
 	}
+}
+
+void processCameraMovement(GLFWwindow *window)
+{
+
+	CameraMovement cameraMovement;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::FORWARD;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::BACKWARD;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::LEFT_SHIFT;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::RIGHT_SHIFT;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::LEFT_ROLL;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::RIGHT_ROLL;
+	}
+
+	camera.processKeyboardMovement(cameraMovement);
 }
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -253,11 +264,11 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 	float yoffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	camera.processMouseMovement(xoffset, yoffset);
 
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera.ProcessMouseScroll(yoffset);
+	camera.processMouseScroll(yoffset);
 }

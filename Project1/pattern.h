@@ -1,7 +1,6 @@
 #ifndef _PATTERN_H
 #define _PATTERN_H
 #include <vector>
-#include <glm/vec3.hpp>
 
 class AbsPattern
 {

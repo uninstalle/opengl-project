@@ -1,7 +1,7 @@
 #ifndef _LIGHT_H
 #define _LIGHT_H
 #include <glm/glm.hpp>
-#include "Shader.h"
+#include "shader.h"
 
 class AbsLight
 {
