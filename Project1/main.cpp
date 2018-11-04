@@ -21,6 +21,7 @@ float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2;
 int isSpotLightOn = 0;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+CameraTransformMatrix CameraMatrix;
 
 GLFWwindow* initGLFWWindow();
 void initGLAD();
@@ -28,7 +29,7 @@ void initGLAD();
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processCameraMovement(GLFWwindow *window);
 
 
@@ -103,10 +104,6 @@ int main()
 	};
 
 
-	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-
-
 	Shader shaderProgram("VertexShader.glsl", "FragmentShader.glsl");
 
 
@@ -132,14 +129,14 @@ int main()
 		processInput(Window);
 		synchronizeMovementSpeed();
 
-		view = camera.GetViewMatrix();
-		projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+		CameraMatrix.view = camera.GetViewMatrix();
+		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightShaderProgram.activate();
 
-		lightShaderProgram.setMat4f(view, "view");
-		lightShaderProgram.setMat4f(projection, "projection");
+		lightShaderProgram.setMat4f(CameraMatrix.view, "view");
+		lightShaderProgram.setMat4f(CameraMatrix.projection, "projection");
 		glm::mat4 lightModel(1.0f);
 		glm::vec3 lightTrans(cos(glfwGetTime()), 0.0f, sin(glfwGetTime()));
 		lightModel = glm::translate(lightModel, lightTrans);
@@ -148,8 +145,8 @@ int main()
 		lightSource.drawPattern();
 
 		shaderProgram.activate();
-		shaderProgram.setMat4f(view, "view");
-		shaderProgram.setMat4f(projection, "projection");
+		shaderProgram.setMat4f(CameraMatrix.view, "view");
+		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
 		shaderProgram.setVec3f(camera.getPosition(), "viewPos");
 		poiL.setPosition(lightTrans);
 		spoL.setPosition(camera.getPosition());
@@ -162,6 +159,7 @@ int main()
 		glm::mat4 model(1.0f);
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		shaderProgram.setMat4f(model, "model");
+		lightSource.drawPattern();
 
 
 		glfwSwapBuffers(Window);
@@ -247,6 +245,14 @@ void processCameraMovement(GLFWwindow *window)
 	{
 		cameraMovement.Movement |= CameraMovement::RIGHT_ROLL;
 	}
+	if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::UPWARD;
+	}
+	if (glfwGetKey(window,GLFW_KEY_LEFT_CONTROL)==GLFW_PRESS)
+	{
+		cameraMovement.Movement |= CameraMovement::DOWNWARD;
+	}
 
 	camera.processKeyboardMovement(cameraMovement);
 }
@@ -260,15 +266,15 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 		lastX = xpos;
 		lastY = ypos;
 	}
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
+	float xOffset = xpos - lastX;
+	float yOffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
-	camera.processMouseMovement(xoffset, yoffset);
+	camera.processMouseMovement(xOffset, yOffset);
 
 }
 
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-	camera.processMouseScroll(yoffset);
+	camera.processMouseScroll(yOffset);
 }

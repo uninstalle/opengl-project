@@ -19,12 +19,12 @@ void Camera::updateCameraVectors()
 		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		this->front = glm::normalize(front);
 		right = glm::normalize(glm::cross(this->front, worldUp));
-		up = glm::normalize(glm::cross(right, this->front));
+		cameraUp = glm::normalize(glm::cross(right, this->front));
 }
 
 glm::mat4 Camera::GetViewMatrix() const
 {
-		return glm::lookAt(position, position + front, up);
+		return glm::lookAt(position, position + front, cameraUp);
 }
 
 
@@ -32,6 +32,7 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 {
 
 	float velocity = movementSpeed * DeltaTime;
+
 	if (direction.Movement & CameraMovement::FORWARD)
 		position += front * velocity;
 	if (direction.Movement & CameraMovement::BACKWARD)
@@ -40,17 +41,21 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 		position -= right * velocity;
 	if (direction.Movement & CameraMovement::RIGHT_SHIFT)
 		position += right * velocity;
+	if (direction.Movement & CameraMovement::UPWARD)
+		position += cameraUp * velocity;
+	if (direction.Movement & CameraMovement::DOWNWARD)
+		position -= cameraUp * velocity;
 
 }
 
-void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)
 {
 
-		xoffset *= mouseSensitivity;
-		yoffset *= mouseSensitivity;
+		xOffset *= mouseSensitivity;
+		yOffset *= mouseSensitivity;
 
-		yaw += xoffset;
-		pitch += yoffset;
+		yaw += xOffset;
+		pitch += yOffset;
 
 		if (constrainPitch)
 		{
@@ -63,10 +68,10 @@ void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constr
 		updateCameraVectors();
 }
 
-void Camera::processMouseScroll(float yoffset)
+void Camera::processMouseScroll(float yOffset)
 {
 		if (zoom >= 1.0f && zoom <= 45.0f)
-			zoom -= yoffset;
+			zoom -= yOffset;
 		if (zoom <= 1.0f)
 			zoom = 1.0f;
 		if (zoom >= 45.0f)

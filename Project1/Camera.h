@@ -11,12 +11,18 @@ struct CameraMovement
 		LEFT_SHIFT = 4,
 		RIGHT_SHIFT = 8,
 		LEFT_ROLL = 16,
-		RIGHT_ROLL = 32
+		RIGHT_ROLL = 32,
+		UPWARD = 64,
+		DOWNWARD = 128
 	};
 	unsigned Movement = 0;
 };
 
-
+struct CameraTransformMatrix
+{
+	glm::mat4 view;
+	glm::mat4 projection;
+};
 
 void synchronizeMovementSpeed();
 
@@ -27,9 +33,9 @@ private:
 
 	glm::vec3 position;
 	glm::vec3 front;
-	glm::vec3 up;
-	glm::vec3 right;
 	glm::vec3 worldUp;
+	glm::vec3 cameraUp;
+	glm::vec3 right;
 	float yaw;
 	float pitch;
 	float movementSpeed;
@@ -45,12 +51,12 @@ private:
 	void updateCameraVectors();
 public:
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = DefaultYaw, float pitch = DefaultPitch) 
-	: position(position), front(glm::vec3(0.0f, 0.0f, -1.0f)), up(up),yaw(yaw),pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
+	: position(position), front(glm::vec3(0.0f, 0.0f, -1.0f)), worldUp(up),yaw(yaw),pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
 		updateCameraVectors();
 	}
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) 
-	: position(glm::vec3(posX, posY, posZ)), front(glm::vec3(0.0f, 0.0f, -1.0f)), up(glm::vec3(upX, upY, upZ)), yaw(yaw), pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
+	: position(glm::vec3(posX, posY, posZ)), front(glm::vec3(0.0f, 0.0f, -1.0f)), worldUp(glm::vec3(upX, upY, upZ)), yaw(yaw), pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
 		updateCameraVectors();
 	}
@@ -65,13 +71,13 @@ public:
 	}
 	glm::vec3 getUp() const
 	{
-		return up;
+		return cameraUp;
 	}
 	float getZoom() const
 	{
 		return zoom;
 	}
 	void processKeyboardMovement(CameraMovement direction);
-	void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-	void processMouseScroll(float yoffset);
+	void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
+	void processMouseScroll(float yOffset);
 };
