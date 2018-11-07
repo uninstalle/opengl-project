@@ -129,7 +129,7 @@ unsigned loadTexture(const char *filePath, const std::string directory)
 	}
 	else
 	{
-		std::cout << "Failed to load texture : " << filePath << "\n" << std::endl;
+		std::cout << "Failed to load texture : " << fileName << "\n" << std::endl;
 	}
 	stbi_image_free(data);
 

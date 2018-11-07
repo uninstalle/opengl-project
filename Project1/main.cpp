@@ -16,7 +16,7 @@
 constexpr float SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
 GLFWwindow *Window = nullptr;
 
-float lastX = SCREEN_WIDTH/2, lastY = SCREEN_HEIGHT/2;
+float lastX = SCREEN_WIDTH / 2, lastY = SCREEN_HEIGHT / 2;
 
 int isSpotLightOn = 0;
 
@@ -32,6 +32,20 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processCameraMovement(GLFWwindow *window);
 
+
+
+SpherePatternTextured mercury(1.0f);
+SpherePatternTextured venus(1.0f);
+SpherePatternTextured earth(1.0f);
+SpherePatternTextured mars(1.0f);
+SpherePatternTextured jupiter(1.0f);
+SpherePatternTextured saturn(1.0f);
+SpherePatternTextured uranus(1.0f);
+SpherePatternTextured neptune(1.0f);
+SpherePattern sun(1.0f);
+
+void initializeStars();
+void updateStarsMovement(Shader &shader);
 
 int main()
 {
@@ -59,69 +73,27 @@ int main()
 	glfwSetScrollCallback(Window, scrollCallback);
 
 
-	float vertices[] = {
-	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	initializeStars();
 
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f, 
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  
-	};
-
-
-	Shader shaderProgram("VertexShader.glsl", "FragmentShader.glsl");
+	Shader shaderProgram("SphereVertexShader.glsl", "FragmentShader.glsl");
+	Shader lightShader("SphereVertexShader.glsl", "LightFragmentShader.glsl");
 
 
 	DirLight dirL(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.5f, 0.5f, 0.5f));
 	PointLight poiL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f),
-		1.0f, 0.09f, 0.032f);
+		1.0f, 0.007f, 0.0002f);
 	SpotLight spoL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
 		1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
 
-	TrianglePattern lightSource;
-	lightSource.loadPattern(vertices, sizeof(vertices));
 
-	Shader lightShaderProgram("VertexShader.glsl", "LightFragmentShader.glsl");
 
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_CULL_FACE);
+
+	
 
 	while (!glfwWindowShouldClose(Window))
 	{
@@ -130,37 +102,32 @@ int main()
 		synchronizeMovementSpeed();
 
 		CameraMatrix.view = camera.GetViewMatrix();
-		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		lightShaderProgram.activate();
+		lightShader.activate();
 
-		lightShaderProgram.setMat4f(CameraMatrix.view, "view");
-		lightShaderProgram.setMat4f(CameraMatrix.projection, "projection");
+		lightShader.setMat4f(CameraMatrix.view, "view");
+		lightShader.setMat4f(CameraMatrix.projection, "projection");
+		lightShader.setVec3f(glm::vec3(1.0f, 1.0f, 1.0f), "lightColor");
 		glm::mat4 lightModel(1.0f);
-		glm::vec3 lightTrans(cos(glfwGetTime()), 0.0f, sin(glfwGetTime()));
-		lightModel = glm::translate(lightModel, lightTrans);
-		lightModel = glm::scale(lightModel, glm::vec3(0.2f, 0.2f, 0.2f));
-		lightShaderProgram.setMat4f(lightModel, "model");
-		lightSource.drawPattern();
+		lightModel = glm::scale(lightModel, glm::vec3(0.696f * 2, 0.696f * 2, 0.696f * 2));
+		lightShader.setMat4f(lightModel, "model");
+		sun.drawPattern();
 
 		shaderProgram.activate();
 		shaderProgram.setMat4f(CameraMatrix.view, "view");
 		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
 		shaderProgram.setVec3f(camera.getPosition(), "viewPos");
-		poiL.setPosition(lightTrans);
+		poiL.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
-		dirL.apply(shaderProgram);
+		//dirL.apply(shaderProgram);
 		poiL.apply(shaderProgram);
 		spoL.apply(shaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"),  isSpotLightOn);
+		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"), isSpotLightOn);
 
-		glm::mat4 model(1.0f);
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		shaderProgram.setMat4f(model, "model");
-		lightSource.drawPattern();
-
+		updateStarsMovement(shaderProgram);
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
@@ -210,7 +177,7 @@ void processInput(GLFWwindow *window)
 	{
 		isZpressed = true;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_RELEASE&&isZpressed)
+	else if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_RELEASE && isZpressed)
 	{
 		isZpressed = false;
 		isSpotLightOn = isSpotLightOn == 0 ? 1 : 0;
@@ -245,11 +212,11 @@ void processCameraMovement(GLFWwindow *window)
 	{
 		cameraMovement.Movement |= CameraMovement::RIGHT_ROLL;
 	}
-	if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		cameraMovement.Movement |= CameraMovement::UPWARD;
 	}
-	if (glfwGetKey(window,GLFW_KEY_LEFT_CONTROL)==GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
 		cameraMovement.Movement |= CameraMovement::DOWNWARD;
 	}
@@ -277,4 +244,131 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
 	camera.processMouseScroll(yOffset);
+}
+
+void initializeStars()
+{
+	mercury.loadPattern(10, 10);
+	mercury.loadTexture("resource/mercury.jpg");
+	venus.loadPattern(10, 10);
+	venus.loadTexture("resource/venus.jpg");
+	earth.loadPattern(10, 10);
+	earth.loadTexture("resource/earth.jpg");
+	mars.loadPattern(10, 10);
+	mars.loadTexture("resource/mars.jpg");
+	jupiter.loadPattern(10, 10);
+	jupiter.loadTexture("resource/jupiter.jpg");
+	saturn.loadPattern(10, 10);
+	saturn.loadTexture("resource/saturn.jpg");
+	uranus.loadPattern(10, 10);
+	uranus.loadTexture("resource/uranus.jpg");
+	neptune.loadPattern(10, 10);
+	neptune.loadTexture("resource/neptune.jpg");
+	sun.loadPattern(5, 5);
+}
+
+void updateStarsMovement(Shader &shader)
+{
+
+	glm::mat4 model(1.0f);
+	glm::vec3 movement(0.3871 * 1.496 * 2.5, 0, 0.3871 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(4.15*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.0244f, 0.0244f, 0.0244f));
+	model = glm::rotate(model, (float)glm::radians(0.017*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	mercury.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(0.7233 * 1.496 * 2.5, 0, 0.7233 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(1.62*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.06052f, 0.06052f, 0.06052f));
+	model = glm::rotate(model, (float)glm::radians(0.004*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	venus.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.06378f, 0.06378f, 0.06378f));
+	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	earth.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(1.5237 * 1.496 * 2.5, 0, 1.5237 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(0.53*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.03397f, 0.03397f, 0.03397f));
+	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	mars.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(5.2026 * 1.496 * 2.5, 0, 5.2026 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(0.084*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.71492f, 0.71492f, 0.71492f));
+	model = glm::rotate(model, (float)glm::radians(2.5*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	jupiter.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(9.5549 * 1.496 * 2.5, 0, 9.5549 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(0.034*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.60268f, 0.60268f, 0.60268f));
+	model = glm::rotate(model, (float)glm::radians(2.4*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	saturn.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(19.2184 * 1.496 * 2.5, 0, 19.2184 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(0.012*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.25559f, 0.25559f, 0.25559f));
+	model = glm::rotate(model, (float)glm::radians(1.4*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	uranus.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(30.1104 * 1.496 * 2.5, 0, 30.1104 * 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(0.006*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.24764f, 0.24764f, 0.24764f));
+	model = glm::rotate(model, (float)glm::radians(1.5*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	neptune.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(2*glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));
+	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	earth.drawPattern(shader);
+
+	model = glm::mat4(1.0f);
+	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
+	model = glm::rotate(model, (float)glm::radians(2*glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
+	glm::vec3 movement2(glm::cos(glm::radians(20 * glfwGetTime())), 0, glm::sin(glm::radians(20 * glfwGetTime())));
+	model = glm::translate(model, movement2);
+	model = glm::translate(model, movement);
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+	model = glm::rotate(model, (float)glm::radians(10*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	shader.setMat4f(model, "model");
+	earth.drawPattern(shader);
 }

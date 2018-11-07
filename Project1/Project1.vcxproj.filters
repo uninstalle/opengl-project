@@ -56,6 +56,9 @@
     <Text Include="FragmentShader.glsl">
       <Filter>Shader</Filter>
     </Text>
+    <Text Include="SingleColorFragmentShader.glsl">
+      <Filter>Shader</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\libs\includes\stb-master\stb_image.h">
@@ -79,5 +82,10 @@
     <ClInclude Include="camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SphereVertexShader.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -150,6 +150,7 @@
     <Text Include="FragmentShader.glsl">
       <FileType>Document</FileType>
     </Text>
+    <Text Include="SingleColorFragmentShader.glsl" />
     <Text Include="VertexShader.glsl">
       <FileType>Document</FileType>
     </Text>
@@ -162,6 +163,9 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="pattern.h" />
     <ClInclude Include="shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SphereVertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
