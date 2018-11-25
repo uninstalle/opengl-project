@@ -136,7 +136,7 @@
     <ClCompile Include="..\..\..\..\..\..\libs\glad\src\glad.c" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
-    <Text Include="LightFragmentShader.glsl">
+    <Text Include="LightFragmentShader.frag">
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="light.cpp" />
@@ -147,11 +147,11 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="FragmentShader.glsl">
+    <Text Include="FragmentShader.frag">
       <FileType>Document</FileType>
     </Text>
-    <Text Include="SingleColorFragmentShader.glsl" />
-    <Text Include="VertexShader.glsl">
+    <Text Include="SingleColorFragmentShader.frag" />
+    <Text Include="VertexShader.vert">
       <FileType>Document</FileType>
     </Text>
   </ItemGroup>

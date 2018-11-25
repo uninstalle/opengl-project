@@ -16,11 +16,11 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{093e4d60-73d2-4019-becf-d0ee63e97e15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="glad">
+      <UniqueIdentifier>{62df87fe-40e5-49ab-801f-dd3383271a6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\libs\glad\src\glad.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="stb_image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -45,18 +45,21 @@
     <ClCompile Include="shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\libs\glad\src\glad.c">
+      <Filter>glad</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="VertexShader.glsl">
+    <Text Include="VertexShader.vert">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="LightFragmentShader.glsl">
+    <Text Include="FragmentShader.frag">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="FragmentShader.glsl">
+    <Text Include="LightFragmentShader.frag">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="SingleColorFragmentShader.glsl">
+    <Text Include="SingleColorFragmentShader.frag">
       <Filter>Shader</Filter>
     </Text>
   </ItemGroup>

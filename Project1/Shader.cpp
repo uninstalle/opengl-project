@@ -12,7 +12,8 @@ Shader::Shader(const char* shaderPath,GLenum shaderType) :shaderType(shaderType)
 {
 	std::string shaderCode = loadShaderCode(shaderPath);
 
-	try {
+	try
+	{
 		compileShader(*this, shaderCode.c_str());
 	}
 	catch (std::runtime_error &e)
@@ -77,30 +78,39 @@ ShaderProgram::ShaderProgram()
 	ID = glCreateProgram();
 }
 
-void ShaderProgram::attachShader(Shader *shader)
+ShaderProgram::ShaderProgram(std::initializer_list<Shader> shaderIL)
 {
-	if (std::find(attachedShader.begin(), attachedShader.end(), shader) != attachedShader.end())
-		throw std::runtime_error("Attach shader failed.Shader has been attached.");
-	else
+	ID = glCreateProgram();
+	for (auto const &i:shaderIL)
 	{
-		glAttachShader(ID, shader->getID());
-		attachedShader.push_back(shader);
+		attachShader(i);
 	}
 }
 
-void ShaderProgram::detachShader(Shader *shader)
+void ShaderProgram::attachShader(Shader shader)
 {
-	auto targetShader = std::find(attachedShader.begin(), attachedShader.end(), shader);
+	if (std::find(attachedShader.begin(), attachedShader.end(), shader.getID()) != attachedShader.end())
+		throw std::runtime_error("Attach shader failed.Shader has been attached.");
+	else
+	{
+		glAttachShader(ID, shader.getID());
+		attachedShader.push_back(shader.getID());
+	}
+}
+
+void ShaderProgram::detachShader(Shader shader)
+{
+	auto targetShader = std::find(attachedShader.begin(), attachedShader.end(), shader.getID());
 	if (targetShader == attachedShader.end())
 		throw std::runtime_error("Detach shader failed.Shader is not attached.");
 	else
 	{
-		glDetachShader(ID, shader->getID());
+		glDetachShader(ID, shader.getID());
 		attachedShader.erase(targetShader);
 	}
 }
 
-std::vector<Shader*> ShaderProgram::getAttachedShader() const
+std::vector<ShaderProgram::ShaderID> ShaderProgram::getAttachedShader() const
 {
 	return attachedShader;
 }
@@ -157,6 +167,19 @@ void ShaderProgram::setMat3f(const glm::mat3 mat, const char *name)
 void ShaderProgram::setMat4f(const glm::mat4 mat, const char *name)
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void ShaderProgram::setUBO(unsigned UBO,int size,const char *name, int offset)
+{
+	unsigned index = glGetUniformBlockIndex(ID, name);
+	if (index == GL_INVALID_INDEX)
+	{
+		std::string errorMessage = std::string("Uniform block ") + name + " not found in shader program.";
+		errorMessage.append("(ID=");
+		errorMessage.append(std::to_string(ID) + ")");
+		throw std::runtime_error(errorMessage);
+	}
+	glBindBufferRange(GL_UNIFORM_BLOCK, index, UBO, offset, size);
 }
 
 ShaderProgram::~ShaderProgram()

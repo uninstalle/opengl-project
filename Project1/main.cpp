@@ -50,11 +50,6 @@ void updateStarsMovement(ShaderProgram &shader);
 int main()
 {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
 
 	try {
 		Window = initGLFWWindow();
@@ -75,18 +70,16 @@ int main()
 
 	initializeStars();
 
-	Shader vertexShader("VertexShader.glsl",GL_VERTEX_SHADER);
-	Shader fragmentShader("FragmentShader.glsl",GL_FRAGMENT_SHADER);
-	Shader lightFragmentShader("LightFragmentShader.glsl",GL_FRAGMENT_SHADER);
+	Shader vertexShader("VertexShader.vert",GL_VERTEX_SHADER);
+	Shader fragmentShader("FragmentShader.frag",GL_FRAGMENT_SHADER);
+	Shader lightFragmentShader("LightFragmentShader.frag",GL_FRAGMENT_SHADER);
 
 	ShaderProgram shaderProgram;
-	shaderProgram.attachShader(&vertexShader);
-	shaderProgram.attachShader(&fragmentShader);
+	shaderProgram.attachShader(vertexShader);
+	shaderProgram.attachShader(fragmentShader);
 	shaderProgram.linkShaders();
 
-	ShaderProgram lightShader;
-	lightShader.attachShader(&vertexShader);
-	lightShader.attachShader(&lightFragmentShader);
+	ShaderProgram lightShader{ vertexShader,lightFragmentShader };
 	lightShader.linkShaders();
 
 
@@ -103,7 +96,10 @@ int main()
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
+	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
 
 	
 
@@ -154,6 +150,11 @@ int main()
 
 GLFWwindow* initGLFWWindow()
 {
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+
 	GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "?", nullptr, nullptr);
 	if (window == nullptr)
 	{

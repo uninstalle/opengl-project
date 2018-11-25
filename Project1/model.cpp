@@ -76,9 +76,9 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 		bool isLoaded = false;
 		for (int j = 0; j < loadedTextures.size(); ++j)
 		{
-			if (strcmp(str.C_Str(), loadedTextures.at(j).path.c_str()) == 0)
+			if (strcmp(str.C_Str(), loadedTextures[j].path.c_str()) == 0)
 			{
-				textures.push_back(loadedTextures.at(j));
+				textures.push_back(loadedTextures[j]);
 				isLoaded = true;
 			}
 		}
