@@ -45,12 +45,12 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 		position += worldUp * velocity;
 	if (direction.Movement & CameraMovement::DOWNWARD)
 		position -= worldUp * velocity;
-	if (direction.Movement & CameraMovement::LEFT_ROLL)
-		worldUp -= right * velocity;
-	if (direction.Movement & CameraMovement::RIGHT_ROLL)
-		worldUp += right * velocity;
+	//if (direction.Movement & CameraMovement::LEFT_ROLL)
+		//worldUp -= right * velocity;
+	//if (direction.Movement & CameraMovement::RIGHT_ROLL)
+		//worldUp += right * velocity;
 
-	updateCameraVectors();
+	//updateCameraVectors();
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)

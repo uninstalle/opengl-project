@@ -1,7 +1,7 @@
 #include "light.h"
 #include <glad/glad.h>
 
-void DirLight::apply(Shader& shader)
+void DirLight::apply(ShaderProgram& shader)
 {
 	shader.setVec3f(position, "dirLight.position");
 	shader.setVec3f(ambient, "dirLight.ambient");
@@ -11,7 +11,7 @@ void DirLight::apply(Shader& shader)
 
 int PointLight::PointLightCount = 0;
 
-void PointLight::apply(Shader& shader)
+void PointLight::apply(ShaderProgram& shader)
 {
 	glUniform1i(glGetUniformLocation(shader.getID(), "PointLightNum"), PointLightCount);
 	char lightIndex = '0' + PointLightCount - 1;
@@ -26,7 +26,7 @@ void PointLight::apply(Shader& shader)
 	glUniform1f(glGetUniformLocation(shader.getID(), std::string(plightName + "quadratic").c_str()), quadratic);
 }
 
-void SpotLight::apply(Shader& shader)
+void SpotLight::apply(ShaderProgram& shader)
 {
 	shader.setVec3f(position, "spotLight.position");
 	shader.setVec3f(ambient, "spotLight.ambient");

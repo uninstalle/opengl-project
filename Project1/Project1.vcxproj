@@ -164,9 +164,6 @@
     <ClInclude Include="pattern.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="SphereVertexShader.glsl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

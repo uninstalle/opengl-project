@@ -30,13 +30,13 @@ public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned> indices;
 	std::vector<Texture> textures;
-
+	Mesh() = default;
 	Mesh(std::vector<Vertex> &&vertices, std::vector<unsigned> &&indices, std::vector<Texture> &&textures)
 	:vertices(vertices),indices(indices),textures(textures)
 	{
 		setupMesh();
 	}
-	void draw(Shader &shader);
+	void draw(ShaderProgram &shader);
 
 };
 

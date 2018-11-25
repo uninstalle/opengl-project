@@ -76,9 +76,9 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 		bool isLoaded = false;
 		for (int j = 0; j < loadedTextures.size(); ++j)
 		{
-			if (strcmp(str.C_Str(), loadedTextures[j].path.c_str()) == 0)
+			if (strcmp(str.C_Str(), loadedTextures.at(j).path.c_str()) == 0)
 			{
-				textures.push_back(loadedTextures[j]);
+				textures.push_back(loadedTextures.at(j));
 				isLoaded = true;
 			}
 		}
@@ -136,7 +136,7 @@ unsigned loadTexture(const char *filePath, const std::string directory)
 	return texture;
 }
 
-void Model::draw(Shader &shader)
+void Model::draw(ShaderProgram &shader)
 {
 	for (auto &i : meshes)
 	{

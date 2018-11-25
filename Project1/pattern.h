@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "shader.h"
+#include "mesh.h"
 
 class AbsPattern
 {
@@ -70,7 +71,10 @@ public:
 	SpherePatternTextured() = default;
 	SpherePatternTextured(float radius) :SpherePattern(radius) {}
 	void loadTexture(const char* path);
-	void drawPattern(Shader &shader);
+	void drawPattern(ShaderProgram &shader);
 };
+
+
+Mesh genSphereMesh(int deltaAlphaDivision, int deltaBetaDivision, const char* texturePath=nullptr);
 
 #endif

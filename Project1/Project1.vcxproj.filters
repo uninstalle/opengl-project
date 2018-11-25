@@ -83,9 +83,4 @@
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="SphereVertexShader.glsl">
-      <Filter>Shader</Filter>
-    </None>
-  </ItemGroup>
 </Project>

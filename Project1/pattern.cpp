@@ -5,15 +5,15 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/ext/scalar_constants.hpp>
 #include "stb-master/stb_image.h"
+
 
 float* AbsPattern::genVerticesArray(AbsPattern &pattern)
 {
 	float *array = new float[pattern.vertices.size()];
 	for (int i = 0; i < pattern.vertices.size(); ++i)
 	{
-		array[i] = pattern.vertices[i];
+		array[i] = pattern.vertices.at(i);
 	}
 	return array;
 }
@@ -23,7 +23,7 @@ unsigned* AbsPattern::genIndicesArray(AbsPattern& pattern)
 	unsigned *array = new unsigned[pattern.indices.size()];
 	for (int i = 0; i < pattern.indices.size(); ++i)
 	{
-		array[i] = pattern.indices[i];
+		array[i] = pattern.indices.at(i);
 	}
 	return array;
 }
@@ -280,7 +280,49 @@ void SpherePatternTextured::loadTexture(const char* path)
 
 }
 
-void SpherePatternTextured::drawPattern(Shader& shader)
+unsigned loadTexture(const char* path)
+{
+	unsigned Texture_ID;
+	glGenTextures(1, &Texture_ID);
+
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		GLenum format;
+		if (nrChannels == 1)
+			format = GL_RED;
+		else if (nrChannels == 3)
+			format = GL_RGB;
+		else if (nrChannels == 4)
+			format = GL_RGBA;
+		else
+			throw std::runtime_error("nrChannels error.\n");
+
+		glBindTexture(GL_TEXTURE_2D, Texture_ID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture : " << path << "\n" << std::endl;
+	}
+	stbi_image_free(data);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, Texture_ID);
+
+	return Texture_ID;
+}
+
+void SpherePatternTextured::drawPattern(ShaderProgram& shader)
 {
 	glUniform1i(glGetUniformLocation(shader.getID(), "material.texture_diffuse1"), 0);
 
@@ -291,4 +333,68 @@ void SpherePatternTextured::drawPattern(Shader& shader)
 	glBindVertexArray(VAO_ID);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(0));
 	glBindVertexArray(0);
+}
+
+Mesh genSphereMesh(int deltaAlphaDivision, int deltaBetaDivision, const char* texturePath)
+{
+	std::vector<Vertex> vertices;
+	std::vector<unsigned> indices;
+	std::vector<Texture> textures;
+	float radius = 1;
+
+	//alpha is in x-z,beta is in x-y
+	int alpha = 0, beta = 0;
+	int halfRoundDivision = 180,
+		RoundDivision = 360,
+		DivisionsInXZ = halfRoundDivision / deltaAlphaDivision,
+		DivisionsInXY = RoundDivision / deltaBetaDivision + 1;
+
+	vertices.reserve(DivisionsInXY*DivisionsInXZ);
+
+	for (alpha = 0; alpha <= halfRoundDivision; alpha += deltaAlphaDivision)
+	{
+		float sina = std::sin(glm::radians(float(alpha)));
+		float cosa = std::cos(glm::radians(float(alpha)));
+		for (beta = 0; beta <= RoundDivision; beta += deltaBetaDivision)
+		{
+			float b = glm::radians(float(beta));
+			float x = sina * std::cos(b)*radius;
+			float y = sina * std::sin(b)*radius;
+			float z = cosa * radius;
+			float u = static_cast<float> (beta) / static_cast<float> (RoundDivision);
+			float v = 1 - static_cast<float> (alpha) / static_cast<float> (halfRoundDivision);
+			Vertex vertex{
+			glm::vec3(x, y, z),
+			glm::vec3(x, y, z),
+			glm::vec2(u, v) };
+			vertices.push_back(vertex);
+		}
+	}
+	indices.reserve(vertices.size() * 6);
+	for (int i = 0; i < vertices.size() - DivisionsInXY; ++i)
+	{
+		if ((i + 1) % DivisionsInXY == 0) // i+1 is in next level
+		{
+			indices.push_back(i);
+			indices.push_back(i + DivisionsInXY);
+			indices.push_back(i + 1 - DivisionsInXY);
+			indices.push_back(i + 1 - DivisionsInXY);
+			indices.push_back(i + DivisionsInXY);
+			indices.push_back(i + 1);
+		}
+		else {
+			indices.push_back(i);
+			indices.push_back(i + DivisionsInXY);
+			indices.push_back(i + 1);
+			indices.push_back(i + 1);
+			indices.push_back(i + DivisionsInXY);
+			indices.push_back(i + DivisionsInXY + 1);
+		}
+	}
+	if (texturePath)
+	{
+		Texture texture{ loadTexture(texturePath) ,Texture::DIFFUSE,texturePath };
+		textures.push_back(texture);
+	}
+	return Mesh(std::move(vertices), std::move(indices), std::move(textures));
 }

@@ -19,7 +19,7 @@ public:
 	virtual void setAmbient(glm::vec3 ambient) { this->ambient = ambient; }
 	virtual void setDiffuse(glm::vec3 diffuse) { this->diffuse = diffuse; }
 	virtual void setSpecular(glm::vec3 specular) { this->specular = specular; }
-	virtual void apply(Shader &shader) = 0;
+	virtual void apply(ShaderProgram &shader) = 0;
 	virtual ~AbsLight() = default;
 };
 
@@ -29,7 +29,7 @@ public:
 	DirLight() = default;
 	DirLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
 		:AbsLight(position, ambient, diffuse, specular) {}
-	void apply(Shader &shader) override;
+	void apply(ShaderProgram &shader) override;
 	~DirLight() = default;
 };
 
@@ -50,7 +50,7 @@ public:
 	void setConstant(float constant) { this->constant = constant; }
 	void setLinear(float linear) { this->linear = linear; }
 	void setQuadratic(float quadratic) { this->quadratic = quadratic; }
-	void apply(Shader& shader) override;
+	void apply(ShaderProgram& shader) override;
 	~PointLight() { PointLightCount--; };
 };
 
@@ -75,7 +75,7 @@ public:
 	void setDirection(glm::vec3 direction) { this->direction = direction; }
 	void setCutOff(float cutoff) { this->cutOff = cutoff; }
 	void setOuterCutOff(float outercutoff) { this->outerCutOff = outercutoff; }
-	void apply(Shader& shader) override;
+	void apply(ShaderProgram& shader) override;
 	~SpotLight() = default;
 };
 
