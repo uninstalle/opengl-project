@@ -126,7 +126,6 @@ int main()
 		shaderProgram.use();
 		shaderProgram.setMat4f(CameraMatrix.view, "view");
 		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
-		shaderProgram.setVec3f(camera.getPosition(), "viewPos");
 		poiL.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
