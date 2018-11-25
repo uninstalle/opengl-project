@@ -86,19 +86,19 @@ vec4 CalDirLight(DirLight light, vec3 normal, vec3 fragmentPosition)
 
 	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
 	vec4 specularTex = texture(material.texture_specular1,TexCoord);
+	
+	vec3 ambient = light.ambient*vec3(diffuseTex);
+	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
+	vec3 specular = light.specular*spec*vec3(specularTex);
 
-	vec4 ambient =  vec4(light.ambient,1.0) * diffuseTex;
-	vec4 diffuse = vec4(light.diffuse,1.0) * diff * diffuseTex;
-	vec4 specular = vec4(light.specular,1.0) * spec * specularTex;
-
-	return ambient + diffuse + specular;
+	return vec4(ambient + diffuse + specular,diffuseTex.a);
 }
 
 vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 {
 // All vectors from uniform that are in world coordinate system need to be conveyed
 // to view coordinate system.
-	light.position = vec3( ViewMat * vec4(light.position,1.0));
+	light.position = vec3(ViewMat * vec4(light.position,1.0));
 // viewDirection: From (0,0,0) to fragment position
 	vec3 viewDirection = normalize(fragmentPosition);
 // lightDirection: From light source to fragment position
@@ -109,19 +109,19 @@ vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadratic*(distance*distance));
-	
+// Keep the A of texture's RGBA unchanged during light computing
 	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
 	vec4 specularTex = texture(material.texture_specular1,TexCoord);
 
-	vec4 ambient = vec4(light.ambient,1.0)*diffuseTex;
-	vec4 diffuse = vec4(light.diffuse,1.0)*diff*diffuseTex;
-	vec4 specular = vec4(light.specular,1.0)*spec*specularTex;
+	vec3 ambient = light.ambient*vec3(diffuseTex);
+	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
+	vec3 specular = light.specular*spec*vec3(specularTex);
 
 	ambient *= attenuation;
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	return ambient + diffuse + specular;
+	return vec4(ambient + diffuse + specular,diffuseTex.a);
 }
 
 vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition)
@@ -143,13 +143,13 @@ vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition)
 	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
 	vec4 specularTex = texture(material.texture_specular1,TexCoord);
 
-	vec4 ambient = vec4(light.ambient,1.0)*diffuseTex;
-	vec4 diffuse = vec4(light.diffuse,1.0)*diff*diffuseTex;
-	vec4 specular = vec4(light.specular,1.0)*spec*specularTex;
+	vec3 ambient = light.ambient*vec3(diffuseTex);
+	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
+	vec3 specular = light.specular*spec*vec3(specularTex);
 
 	ambient *= attenuation;
 	diffuse *= attenuation * intensity;
 	specular *= attenuation * intensity;
 
-	return ambient + diffuse + specular;
+	return vec4(ambient + diffuse + specular,diffuseTex.a);
 }
