@@ -10,6 +10,7 @@
 #include "pattern.h"
 #include "light.h"
 #include "model.h"
+#include "posteffect.h"
 
 
 
@@ -70,9 +71,9 @@ int main()
 
 	initializeStars();
 
-	Shader vertexShader("VertexShader.vert",GL_VERTEX_SHADER);
-	Shader fragmentShader("FragmentShader.frag",GL_FRAGMENT_SHADER);
-	Shader lightFragmentShader("LightFragmentShader.frag",GL_FRAGMENT_SHADER);
+	Shader vertexShader("VertexShader.vert", GL_VERTEX_SHADER);
+	Shader fragmentShader("FragmentShader.frag", GL_FRAGMENT_SHADER);
+	Shader lightFragmentShader("LightFragmentShader.frag", GL_FRAGMENT_SHADER);
 
 	ShaderProgram shaderProgram;
 	shaderProgram.attachShader(vertexShader);
@@ -90,18 +91,13 @@ int main()
 	SpotLight spoL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
 		1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
-
+	initializeScreenFrameBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
 
-	
+
+
 
 	while (!glfwWindowShouldClose(Window))
 	{
@@ -109,9 +105,18 @@ int main()
 		processInput(Window);
 		synchronizeMovementSpeed();
 
+		enableScreenFrameBuffer();
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_MULTISAMPLE);
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
 		CameraMatrix.view = camera.GetViewMatrix();
 		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 		lightShader.use();
 
@@ -135,6 +140,10 @@ int main()
 		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"), isSpotLightOn);
 
 		updateStarsMovement(shaderProgram);
+
+		disableScreenFrameBuffer();
+
+		drawScreenFrameBuffer();
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
@@ -356,7 +365,7 @@ void updateStarsMovement(ShaderProgram &shader)
 
 	model = glm::mat4(1.0f);
 	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(2*glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
+	model = glm::rotate(model, (float)glm::radians(2 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
 	model = glm::translate(model, movement);
 	model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));
 	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -366,12 +375,12 @@ void updateStarsMovement(ShaderProgram &shader)
 
 	model = glm::mat4(1.0f);
 	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(2*glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
+	model = glm::rotate(model, (float)glm::radians(2 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
 	glm::vec3 movement2(glm::cos(glm::radians(20 * glfwGetTime())), 0, glm::sin(glm::radians(20 * glfwGetTime())));
 	model = glm::translate(model, movement2);
 	model = glm::translate(model, movement);
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-	model = glm::rotate(model, (float)glm::radians(10*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, (float)glm::radians(10 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	shader.setMat4f(model, "model");
 	earth.draw(shader);
