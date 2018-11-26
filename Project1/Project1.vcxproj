@@ -145,6 +145,7 @@
     <ClCompile Include="pattern.cpp" />
     <ClCompile Include="posteffect.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="skybox.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,8 +166,11 @@
     <ClInclude Include="pattern.h" />
     <ClInclude Include="posteffect.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="skybox.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CubeMapFragmentShader.frag" />
+    <None Include="CubeMapVertexShader.vert" />
     <None Include="PostEffectFragmentShader.frag" />
     <None Include="PostEffectVertexShader.vert" />
   </ItemGroup>

@@ -11,6 +11,7 @@
 #include "light.h"
 #include "model.h"
 #include "posteffect.h"
+#include "skybox.h"
 
 
 
@@ -92,6 +93,7 @@ int main()
 		1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
 	initializeScreenFrameBuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	initializeSkybox();
 
 
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
@@ -113,9 +115,10 @@ int main()
 		glEnable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		CameraMatrix.view = camera.GetViewMatrix();
 		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 
 		lightShader.use();
@@ -140,6 +143,8 @@ int main()
 		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"), isSpotLightOn);
 
 		updateStarsMovement(shaderProgram);
+
+		drawSkybox(CameraMatrix.view, CameraMatrix.projection);
 
 		disableScreenFrameBuffer();
 

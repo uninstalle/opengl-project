@@ -4,6 +4,7 @@
 #define PROCESS_SHARPEN 4
 #define PROCESS_BLUR 8
 #define PROCESS_EDGE_DETECTION 16
+
 out vec4 FragColor;
 in vec2 TexCoord;
 uniform sampler2D ScreenTexture;
@@ -63,5 +64,10 @@ void main()
 			float average = 0.2126 * FragColor.r + 0.7152 * FragColor.g + 0.0722 * FragColor.b;
 			FragColor = vec4(average, average, average, 1.0);
 		}
+
+	// Gamma correction
+    // Dont use it now, light computing isnt updated yet.
+	//float gamma = 2.2;
+    //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
 	
 }

@@ -8,14 +8,6 @@ static unsigned ScreenColorTexture;
 static unsigned ScreenFrameBufferVAO;
 static ShaderProgram *PostEffectShader;
 
-enum PostEffect
-{
-	INVERSION = 1,
-	GRAYSCALE = 2,
-	SHARPEN = 4,
-	BLUR = 8,
-	EDGE_DETECTION = 16
-};
 
 
 static void initializeVAOForScreenFrameBuffer()

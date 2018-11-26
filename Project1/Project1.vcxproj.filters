@@ -54,6 +54,9 @@
     <ClCompile Include="posteffect.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="skybox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="VertexShader.vert">
@@ -94,12 +97,21 @@
     <ClInclude Include="posteffect.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="skybox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="PostEffectVertexShader.vert">
       <Filter>Shader</Filter>
     </None>
     <None Include="PostEffectFragmentShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="CubeMapFragmentShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="CubeMapVertexShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
