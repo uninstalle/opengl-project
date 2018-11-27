@@ -1,0 +1,58 @@
+newmtl _default_
+Kd 0.502 0.502 0.502 
+Ks 0.067 0.067 0.067 
+Ns 30
+
+newmtl material_2_356
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/boeing_b_17e_c.jpg
+map_Ks textures/boeing_b_17e_n_s.jpg
+
+newmtl material_7_358
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/boeing_b_17e_tex2_c.jpg
+map_Ks textures/boeing_b_17e_tex2_n_s.jpg
+
+newmtl material_3_358
+Kd 0.502 0.502 0.502 
+Ks 0.753 0.753 0.753 
+Ns 100
+
+newmtl material_9_359
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/aircraft_inside3_a.jpg
+map_Ks textures/aircraft_inside3_n_s.jpg
+
+newmtl material_11_359
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/engine_wright_r_1820_c.jpg
+map_Ks textures/engine_wright_r_1820_n_s.jpg
+
+newmtl material_8_359
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/barrage_balloon_rope.jpg
+
+newmtl material_12_359
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/pylon_b_17_a.jpg
+map_Ks textures/pylon_b_17_n_s.jpg
+
+newmtl material_6_360
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/mg_ff_flex_alfa_a.jpg
+map_Ks textures/mg_ff_flex_alfa_n_s.jpg
+

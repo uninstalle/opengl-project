@@ -71,6 +71,7 @@ int main()
 
 
 	initializeStars();
+	Model P51("resource/nanosuit/nanosuit.obj");
 
 	Shader vertexShader("VertexShader.vert", GL_VERTEX_SHADER);
 	Shader fragmentShader("FragmentShader.frag", GL_FRAGMENT_SHADER);
@@ -121,15 +122,15 @@ int main()
 
 
 
-		lightShader.use();
+		shaderProgram.use();
 
-		lightShader.setMat4f(CameraMatrix.view, "view");
-		lightShader.setMat4f(CameraMatrix.projection, "projection");
-		lightShader.setVec3f(glm::vec3(1.0f, 1.0f, 1.0f), "lightColor");
+		shaderProgram.setMat4f(CameraMatrix.view, "view");
+		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
+		//lightShader.setVec3f(glm::vec3(1.0f, 1.0f, 1.0f), "lightColor");
 		glm::mat4 lightModel(1.0f);
-		lightModel = glm::scale(lightModel, glm::vec3(0.696f * 2, 0.696f * 2, 0.696f * 2));
-		lightShader.setMat4f(lightModel, "model");
-		sun.draw(lightShader);
+		lightModel = glm::scale(lightModel, glm::vec3(0.1f, 0.1f, 0.1f));
+		shaderProgram.setMat4f(lightModel, "model");
+		P51.draw(shaderProgram);
 
 		shaderProgram.use();
 		shaderProgram.setMat4f(CameraMatrix.view, "view");

@@ -1,0 +1,37 @@
+newmtl _default_
+Kd 0.502 0.502 0.502 
+Ks 0.067 0.067 0.067 
+Ns 30
+
+newmtl material_1_829
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/p_51_mk1a_trop_c.jpg
+map_Ks textures/p_51_mk1a_n_s.jpg
+
+newmtl material_7_830
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/aircraft_inside5_a.jpg
+map_Ks textures/aircraft_inside5_n_s.jpg
+
+newmtl material_4_830
+Kd 0.502 0.502 0.502 
+Ks 0.753 0.753 0.753 
+Ns 100
+
+newmtl material_0_830
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/us_pylon_p51a_c.jpg
+map_Ks textures/us_pylon2_n_s.jpg
+
+newmtl material_8_830
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/barrage_balloon_rope.jpg
+
