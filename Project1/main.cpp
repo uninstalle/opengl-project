@@ -71,7 +71,7 @@ int main()
 
 
 	initializeStars();
-	Model P51("resource/nanosuit/nanosuit.obj");
+	Model P51("resource/B-17E/B-17E.obj");
 
 	Shader vertexShader("VertexShader.vert", GL_VERTEX_SHADER);
 	Shader fragmentShader("FragmentShader.frag", GL_FRAGMENT_SHADER);
@@ -115,7 +115,7 @@ int main()
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
+		//glEnable(GL_BLEND);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		CameraMatrix.view = camera.GetViewMatrix();
 		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);

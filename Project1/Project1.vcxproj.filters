@@ -68,9 +68,6 @@
     <Text Include="LightFragmentShader.frag">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="SingleColorFragmentShader.frag">
-      <Filter>Shader</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="light.h">

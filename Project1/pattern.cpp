@@ -318,6 +318,7 @@ unsigned loadTexture(const char* path)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture_ID);
+	stbi_set_flip_vertically_on_load(false);
 
 	return Texture_ID;
 }

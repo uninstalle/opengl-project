@@ -152,7 +152,6 @@
     <Text Include="FragmentShader.frag">
       <FileType>Document</FileType>
     </Text>
-    <Text Include="SingleColorFragmentShader.frag" />
     <Text Include="VertexShader.vert">
       <FileType>Document</FileType>
     </Text>

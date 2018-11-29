@@ -9,7 +9,7 @@ Ks 0.251 0.251 0.251
 Ns 48
 map_Kd textures/boeing_b_17e_c.jpg
 map_Ks textures/boeing_b_17e_n_s.jpg
-
+map_bump  textures/boeing_b_17e_n.dds
 newmtl material_7_358
 Kd 0.502 0.502 0.502 
 Ks 0.251 0.251 0.251 
