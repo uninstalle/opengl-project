@@ -15,13 +15,9 @@ private:
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial *material, aiTextureType textureType, int type);
 public:
-	Model(const char *path)
-	{
-		loadModel(path);
-	}
+	Model(const char *path);
 	void draw(ShaderProgram &shader);
 };
 
-unsigned loadTexture(const char *filePath, const std::string directory);
 
 #endif

@@ -3,17 +3,26 @@
 #include <glad/glad.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <stb-master/stb_image.h>
+
+Model::Model(const char* path)
+{
+		try {
+			loadModel(path);
+		}
+		catch (std::runtime_error &e)
+		{
+			std::cout << "Error in loading model." << std::endl;
+			std::cout << e.what() << std::endl;
+		}
+}
+
 
 void Model::loadModel(std::string path)
 {
 	Assimp::Importer importer;
-	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs |aiProcess_GenSmoothNormals);
 	if (!scene || scene->mFlags&AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-		return;
-	}
+		throw std::runtime_error(importer.GetErrorString());
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
 }
@@ -40,15 +49,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		Vertex vertex;
 		vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-		if (mesh->mNormals)
-			vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-		else
-			vertex.Normal = glm::vec3(0, 0, 1);
+
+		vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 
 		if (mesh->mTextureCoords[0])
 			vertex.TexCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		else
 			vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+
 		vertices.push_back(vertex);
 	}
 
@@ -80,10 +88,11 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 		bool isLoaded = false;
 		for (int j = 0; j < loadedTextures.size(); ++j)
 		{
-			if (strcmp(str.C_Str(), loadedTextures[j].path.c_str()) == 0)
+			if (loadedTextures[j].path==str.C_Str())
 			{
 				textures.push_back(loadedTextures[j]);
 				isLoaded = true;
+				break;
 			}
 		}
 		if (!isLoaded)
@@ -97,47 +106,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 		}
 	}
 	return textures;
-}
-
-unsigned loadTexture(const char *filePath, const std::string directory)
-{
-	std::string fileName(filePath);
-	fileName = directory + '/' + fileName;
-
-	unsigned texture;
-	glGenTextures(1, &texture);
-
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &nrChannels, 0);
-
-	if (data)
-	{
-		GLenum format;
-		if (nrChannels == 1)
-			format = GL_RED;
-		else if (nrChannels == 3)
-			format = GL_RGB;
-		else if (nrChannels == 4)
-			format = GL_RGBA;
-		else
-			throw std::runtime_error("nrChannels error.\n");
-
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture : " << fileName << "\n" << std::endl;
-	}
-	stbi_image_free(data);
-
-	return texture;
 }
 
 void Model::draw(ShaderProgram &shader)

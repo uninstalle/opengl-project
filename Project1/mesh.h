@@ -40,5 +40,6 @@ public:
 
 };
 
+unsigned loadTexture(const char *filePath, const std::string directory);
 
 #endif

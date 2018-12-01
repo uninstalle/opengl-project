@@ -101,7 +101,6 @@ int main()
 
 
 
-
 	while (!glfwWindowShouldClose(Window))
 	{
 		//inputting
@@ -110,12 +109,13 @@ int main()
 
 		enableScreenFrameBuffer();
 
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_MULTISAMPLE);
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glEnable(GL_BLEND);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		CameraMatrix.view = camera.GetViewMatrix();
 		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -128,6 +128,7 @@ int main()
 		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
 		//lightShader.setVec3f(glm::vec3(1.0f, 1.0f, 1.0f), "lightColor");
 		glm::mat4 lightModel(1.0f);
+		lightModel = glm::translate(lightModel, glm::vec3(1.0f, 1.0f, 0.0f));
 		lightModel = glm::scale(lightModel, glm::vec3(0.1f, 0.1f, 0.1f));
 		shaderProgram.setMat4f(lightModel, "model");
 		P51.draw(shaderProgram);
@@ -147,6 +148,7 @@ int main()
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);
 
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		disableScreenFrameBuffer();
 
 		drawScreenFrameBuffer();
