@@ -1,6 +1,8 @@
 #pragma once
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 struct CameraMovement
 {
@@ -32,31 +34,30 @@ class Camera
 private:
 
 	glm::vec3 position;
+	glm::vec3 CameraUp;
+	glm::vec3 CameraFront;
+	glm::vec3 CameraRight;
+	glm::vec3 WorldUp;
+	glm::vec3 up;
 	glm::vec3 front;
-	glm::vec3 worldUp;
-	glm::vec3 cameraUp;
 	glm::vec3 right;
-	float yaw;
-	float pitch;
+	glm::quat rotate;
 	float movementSpeed;
 	float mouseSensitivity;
 	float zoom;
 
-	static constexpr float DefaultYaw = -90.0f;
-	static constexpr float DefaultPitch = 0.0f;
 	static constexpr float DefaultSpeed = 1.5f;
-	static constexpr float DefaultSensitivity = 0.1f;
+	static constexpr float DefaultSensitivity = 0.0001f;
 	static constexpr float DefaultZoom = 45.0f;
 
 	void updateCameraVectors();
 public:
-	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = DefaultYaw, float pitch = DefaultPitch) 
-	: position(position), front(glm::vec3(0.0f, 0.0f, -1.0f)), worldUp(up),yaw(yaw),pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
-	{
-		updateCameraVectors();
-	}
-	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) 
-	: position(glm::vec3(posX, posY, posZ)), front(glm::vec3(0.0f, 0.0f, -1.0f)), worldUp(glm::vec3(upX, upY, upZ)), yaw(yaw), pitch(pitch), movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
+	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f)
+			):
+		position(position), front(front), up(up), rotate(glm::quat(1, 0, 0, 0)),
+		movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
 		updateCameraVectors();
 	}
@@ -65,17 +66,12 @@ public:
 	{
 		return position;
 	}
-	glm::vec3 getFront() const
-	{
-		return front;
-	}
-	glm::vec3 getUp() const
-	{
-		return cameraUp;
-	}
 	float getZoom() const
 	{
 		return zoom;
+	}
+	glm::vec3 getFront() {
+		return CameraFront;
 	}
 	void processKeyboardMovement(CameraMovement direction);
 	void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
