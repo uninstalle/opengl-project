@@ -25,12 +25,17 @@ public:
 
 class DirLight :public AbsLight
 {
+private:
+	static int DirLightCount;
 public:
-	DirLight() = default;
+	DirLight() { DirLightCount++; }
 	DirLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
-		:AbsLight(position, ambient, diffuse, specular) {}
+		:AbsLight(position, ambient, diffuse, specular) 
+	{
+		DirLightCount++;
+	}
 	void apply(ShaderProgram &shaderProgram) override;
-	~DirLight() = default;
+	~DirLight() { DirLightCount--; }
 };
 
 class PointLight :public AbsLight
@@ -63,12 +68,16 @@ private:
 	glm::vec3 direction;
 	float cutOff;
 	float outerCutOff;
+	static int SpotLightCount;
 public:
-	SpotLight() = default;
+	SpotLight() { SpotLightCount++; }
 	SpotLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
 		float constant, float linear, float quadratic, glm::vec3 direction, float cutoff,float outercutoff)
 		: AbsLight(position, ambient, diffuse, specular), constant(constant),
-		linear(linear), quadratic(quadratic), direction(direction), cutOff(cutoff),outerCutOff(outercutoff) {}
+		linear(linear), quadratic(quadratic), direction(direction), cutOff(cutoff),outerCutOff(outercutoff)
+	{
+		SpotLightCount++;
+	}
 	void setConstant(float constant) { this->constant = constant; }
 	void setLinear(float linear) { this->linear = linear; }
 	void setQuadratic(float quadratic) { this->quadratic = quadratic; }
@@ -76,7 +85,7 @@ public:
 	void setCutOff(float cutoff) { this->cutOff = cutoff; }
 	void setOuterCutOff(float outercutoff) { this->outerCutOff = outercutoff; }
 	void apply(ShaderProgram& shaderProgram) override;
-	~SpotLight() = default;
+	~SpotLight() { SpotLightCount--; }
 };
 
 #endif

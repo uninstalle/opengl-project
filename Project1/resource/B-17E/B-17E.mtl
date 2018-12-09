@@ -9,7 +9,8 @@ Ks 0.251 0.251 0.251
 Ns 48
 map_Kd textures/boeing_b_17e_c.jpg
 map_Ks textures/boeing_b_17e_n_s.jpg
-map_bump  textures/boeing_b_17e_n.dds
+map_Bump textures/boeing_b_17e_normal.jpg
+
 newmtl material_7_358
 Kd 0.502 0.502 0.502 
 Ks 0.251 0.251 0.251 
@@ -55,4 +56,3 @@ Ks 0.251 0.251 0.251
 Ns 48
 map_Kd textures/mg_ff_flex_alfa_a.jpg
 map_Ks textures/mg_ff_flex_alfa_n_s.jpg
-

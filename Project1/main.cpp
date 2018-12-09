@@ -7,7 +7,6 @@
 
 #include "shader.h"
 #include "camera.h"
-#include "pattern.h"
 #include "light.h"
 #include "model.h"
 #include "posteffect.h"
@@ -36,19 +35,6 @@ void processCameraMovement(GLFWwindow *window);
 
 
 
-Mesh mercury;
-Mesh venus;
-Mesh earth;
-Mesh mars;
-Mesh jupiter;
-Mesh saturn;
-Mesh uranus;
-Mesh neptune;
-Mesh sun;
-
-void initializeStars();
-void updateStarsMovement(ShaderProgram &shader);
-
 int main()
 {
 	glfwInit();
@@ -70,7 +56,6 @@ int main()
 	glfwSetScrollCallback(Window, scrollCallback);
 
 
-	initializeStars();
 	Model P51("resource/B-17E/B-17E.obj");
 
 	Shader vertexShader("VertexShader.vert", GL_VERTEX_SHADER);
@@ -87,7 +72,7 @@ int main()
 
 
 
-	DirLight dirL(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.5f, 0.5f, 0.5f));
+	DirLight dirL(glm::vec3(0.0f, -1.0f, -1.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.8f, 0.8f, 0.8f));
 	PointLight poiL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f),
 		1.0f, 0.007f, 0.0002f);
 	SpotLight spoL(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -114,7 +99,7 @@ int main()
 		glEnable(GL_MULTISAMPLE);
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
+		//glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		CameraMatrix.view = camera.GetViewMatrix();
@@ -123,30 +108,39 @@ int main()
 
 
 		shaderProgram.use();
-
+		shaderProgram.setVec3f(camera.getPosition(), "ViewPosition");
 		shaderProgram.setMat4f(CameraMatrix.view, "view");
 		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
-		//lightShader.setVec3f(glm::vec3(1.0f, 1.0f, 1.0f), "lightColor");
-		glm::mat4 lightModel(1.0f);
-		lightModel = glm::translate(lightModel, glm::vec3(1.0f, 1.0f, 0.0f));
-		lightModel = glm::scale(lightModel, glm::vec3(0.1f, 0.1f, 0.1f));
-		shaderProgram.setMat4f(lightModel, "model");
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		shaderProgram.setMat4f(model, "model");
 		P51.draw(shaderProgram);
 
 		shaderProgram.use();
 		shaderProgram.setMat4f(CameraMatrix.view, "view");
 		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
-		poiL.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		glm::vec3 pointPos = glm::vec3(cos(glfwGetTime()), 0.0f, sin(glfwGetTime()));
+		poiL.setPosition(pointPos);
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
 		//dirL.apply(shaderProgram);
 		poiL.apply(shaderProgram);
 		spoL.apply(shaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "isSpotLightOn"), isSpotLightOn);
+		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "numOfSpotLights"), isSpotLightOn);
 
-		updateStarsMovement(shaderProgram);
+		lightShader.use();
+		glm::mat4 lightModel(1.0f);
+		lightModel = glm::translate(lightModel, pointPos);
+		lightModel = glm::scale(lightModel, glm::vec3(0.01f, 0.01f, 0.01f));
+		lightShader.setMat4f(CameraMatrix.view, "view");
+		lightShader.setMat4f(CameraMatrix.projection, "projection");
+		lightShader.setMat4f(lightModel, "model");
+		P51.draw(lightShader);
+
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);
+
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		disableScreenFrameBuffer();
@@ -166,7 +160,7 @@ int main()
 
 GLFWwindow* initGLFWWindow()
 {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -273,123 +267,4 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
 	camera.processMouseScroll(yOffset);
-}
-
-void initializeStars()
-{
-	mercury = genSphereMesh(10, 10, "resource/mercury.jpg");
-	venus = genSphereMesh(10, 10, "resource/venus.jpg");
-	earth = genSphereMesh(10, 10, "resource/earth.jpg");
-	mars = genSphereMesh(10, 10, "resource/mars.jpg");
-	jupiter = genSphereMesh(10, 10, "resource/jupiter.jpg");
-	saturn = genSphereMesh(10, 10, "resource/saturn.jpg");
-	uranus = genSphereMesh(10, 10, "resource/uranus.jpg");
-	neptune = genSphereMesh(10, 10, "resource/neptune.jpg");
-	sun = genSphereMesh(5, 5);
-}
-
-void updateStarsMovement(ShaderProgram &shader)
-{
-
-	glm::mat4 model(1.0f);
-	glm::vec3 movement(0.3871 * 1.496 * 2.5, 0, 0.3871 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(4.15*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.0244f, 0.0244f, 0.0244f));
-	model = glm::rotate(model, (float)glm::radians(0.017*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	mercury.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(0.7233 * 1.496 * 2.5, 0, 0.7233 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(1.62*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.06052f, 0.06052f, 0.06052f));
-	model = glm::rotate(model, (float)glm::radians(0.004*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	venus.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.06378f, 0.06378f, 0.06378f));
-	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	earth.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(1.5237 * 1.496 * 2.5, 0, 1.5237 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(0.53*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.03397f, 0.03397f, 0.03397f));
-	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	mars.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(5.2026 * 1.496 * 2.5, 0, 5.2026 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(0.084*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.71492f, 0.71492f, 0.71492f));
-	model = glm::rotate(model, (float)glm::radians(2.5*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	jupiter.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(9.5549 * 1.496 * 2.5, 0, 9.5549 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(0.034*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.60268f, 0.60268f, 0.60268f));
-	model = glm::rotate(model, (float)glm::radians(2.4*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	saturn.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(19.2184 * 1.496 * 2.5, 0, 19.2184 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(0.012*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.25559f, 0.25559f, 0.25559f));
-	model = glm::rotate(model, (float)glm::radians(1.4*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	uranus.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(30.1104 * 1.496 * 2.5, 0, 30.1104 * 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(0.006*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.24764f, 0.24764f, 0.24764f));
-	model = glm::rotate(model, (float)glm::radians(1.5*glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	neptune.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(2 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));
-	model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	earth.draw(shader);
-
-	model = glm::mat4(1.0f);
-	movement = glm::vec3(1.496 * 2.5, 0, 1.496 * 2.5);
-	model = glm::rotate(model, (float)glm::radians(2 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 1.0f));
-	glm::vec3 movement2(glm::cos(glm::radians(20 * glfwGetTime())), 0, glm::sin(glm::radians(20 * glfwGetTime())));
-	model = glm::translate(model, movement2);
-	model = glm::translate(model, movement);
-	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-	model = glm::rotate(model, (float)glm::radians(10 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	shader.setMat4f(model, "model");
-	earth.draw(shader);
 }

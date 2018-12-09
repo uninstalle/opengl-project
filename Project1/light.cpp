@@ -3,17 +3,21 @@
 
 void DirLight::apply(ShaderProgram& shaderProgram)
 {
+
+	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "numOfDirLights"), DirLightCount);
 	shaderProgram.setVec3f(position, "dirLight.position");
 	shaderProgram.setVec3f(ambient, "dirLight.ambient");
 	shaderProgram.setVec3f(diffuse, "dirLight.diffuse");
 	shaderProgram.setVec3f(specular, "dirLight.specular");
 }
 
+int DirLight::DirLightCount = 0;
 int PointLight::PointLightCount = 0;
+int SpotLight::SpotLightCount = 0;
 
 void PointLight::apply(ShaderProgram& shaderProgram)
 {
-	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "PointLightNum"), PointLightCount);
+	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "numOfPointLights"), PointLightCount);
 	char lightIndex = '0' + PointLightCount - 1;
 	std::string plightName("pointLight[0].");
 	plightName.at(plightName.find('0')) = lightIndex;
@@ -28,6 +32,7 @@ void PointLight::apply(ShaderProgram& shaderProgram)
 
 void SpotLight::apply(ShaderProgram& shaderProgram)
 {
+	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "numOfSpotLights"), SpotLightCount);
 	shaderProgram.setVec3f(position, "spotLight.position");
 	shaderProgram.setVec3f(ambient, "spotLight.ambient");
 	shaderProgram.setVec3f(diffuse, "spotLight.diffuse");

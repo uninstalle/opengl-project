@@ -9,11 +9,13 @@ struct Vertex
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
+	glm::vec3 Tangent;
+	glm::vec3 BiTangent;
 };
 
 struct Texture
 {
-	enum TYPE { DIFFUSE = 1, SPECULAR = 2 };
+	enum TYPE { DIFFUSE = 1, SPECULAR = 2,NORMAL = 3 };
 	unsigned ID;
 	int type;
 	std::string path;

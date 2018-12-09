@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include <glad/glad.h>
 #include <string>
+#include <stdexcept>
 #include <stb-master/stb_image.h>
 
 static unsigned DefaultWhiteTexture;
@@ -26,10 +27,14 @@ void Mesh::setupMesh()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Normal)));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Tangent)));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, BiTangent)));
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
 
 	glBindVertexArray(0);
 }
@@ -38,6 +43,7 @@ void Mesh::draw(ShaderProgram &shader)
 {
 	unsigned diffuse = 0;
 	unsigned specular = 0;
+	unsigned normal = 0;
 	for (int i = 0; i < textures.size(); ++i)
 	{
 		std::string name = "material.";
@@ -51,6 +57,11 @@ void Mesh::draw(ShaderProgram &shader)
 		{
 			name.append("texture_specular");
 			name.append(std::to_string(++specular));
+		}
+		else if (textures[i].type == Texture::NORMAL)
+		{
+			name.append("texture_normal");
+			name.append(std::to_string(++normal));
 		}
 		glUniform1i(glGetUniformLocation(shader.getID(), name.c_str()), i);
 

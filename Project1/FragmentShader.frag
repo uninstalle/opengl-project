@@ -1,15 +1,15 @@
-#version 330 core
-#define MAX_POINTLIGHT_NUM 4
+#version 450 core
+#define MAX_POINTLIGHT_NUM 2
 
 struct Material {
 	sampler2D texture_diffuse1;
 	sampler2D texture_diffuse2;
-	sampler2D texture_diffuse3;
 	sampler2D texture_specular1;
 	sampler2D texture_specular2;
-	sampler2D texture_specular3;
+	sampler2D texture_normal1;
 	float shininess;
 };
+
 struct DirLight {
 	vec3 position;
 	vec3 ambient;
@@ -41,19 +41,23 @@ struct SpotLight {
 
 out vec4 FragColor;
 
-in vec2 TexCoord;
-in vec3 Normal;
-in vec3 FragPos;
-in mat4 ViewMat;
+in VERTEX_OUT {
+	in vec2 TexCoord;
+	in vec3 FragPos;
+	in vec3 ViewPos;
+} vs_result;
 
 uniform Material material;
-uniform DirLight dirLight;
-uniform PointLight pointLight[MAX_POINTLIGHT_NUM];
-uniform SpotLight spotLight;
 
-uniform int isSpotLightOn;
+in LIGHT_OUT {
+	DirLight fDirLight;
+	PointLight fPointLight[MAX_POINTLIGHT_NUM];
+	SpotLight fSpotLight;
+};
 
-uniform int PointLightNum;
+uniform int numOfDirLights;
+uniform int numOfPointLights;
+uniform int numOfSpotLights;
 
 vec4 CalDirLight(DirLight light, vec3 normal, vec3 fragmentPosition);
 vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition);
@@ -61,31 +65,32 @@ vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition);
 
 void main()
 {
-	vec3 normal = normalize(Normal);
-// viewDirection: from view point(0,0,0) to fragment position,
-// which is also the fragment position in view coordinate system.
+// normal is in tangent space
+	vec3 normal = texture(material.texture_normal1,vs_result.TexCoord).rgb;
+	normal = normalize(normal*2.0-1.0);
+	vec4 result = vec4(0.0);
+	if (numOfDirLights>0)
+		result = CalDirLight(fDirLight, normal, vs_result.FragPos);
+	for (int i = 0; i < numOfPointLights; i++)
+		result += CalPointLight(fPointLight[i], normal, vs_result.FragPos);
+	if (numOfSpotLights>0)
+		result += CalSpotLight(fSpotLight, normal, vs_result.FragPos);
 
-	vec4 result = CalDirLight(dirLight, normal, FragPos);
-	for (int i = 0; i < PointLightNum; i++)
-		result += CalPointLight(pointLight[i], normal, FragPos);
-	if (isSpotLightOn == 1)
-		result += CalSpotLight(spotLight, normal, FragPos);
-
+	//FragColor = vec4(normal,1.0);
 	FragColor = result;
 }
 
 
 vec4 CalDirLight(DirLight light, vec3 normal, vec3 fragmentPosition)
 {
-	light.position = vec3(ViewMat * vec4(light.position,0.0));
 	vec3 lightDirection = normalize(light.position);
 	float diff = max(dot(normal, -lightDirection), 0.0);
-	vec3 viewDirection = normalize(fragmentPosition);
+	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
+	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
 
-	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
-	vec4 specularTex = texture(material.texture_specular1,TexCoord);
+	vec4 diffuseTex = texture(material.texture_diffuse1, vs_result.TexCoord);
+	vec4 specularTex = texture(material.texture_specular1,vs_result.TexCoord);
 	
 	vec3 ambient = light.ambient*vec3(diffuseTex);
 	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
@@ -96,22 +101,20 @@ vec4 CalDirLight(DirLight light, vec3 normal, vec3 fragmentPosition)
 
 vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 {
-// All vectors from uniform that are in world coordinate system need to be conveyed
-// to view coordinate system.
-	light.position = vec3(ViewMat * vec4(light.position,1.0));
-// viewDirection: From (0,0,0) to fragment position
-	vec3 viewDirection = normalize(fragmentPosition);
+// Calculate light in tangent space
+// viewDirection: From viewer's position to fragment position
+	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
 // lightDirection: From light source to fragment position
 	vec3 lightDirection = normalize(fragmentPosition - light.position);
 	float diff = max(dot(normal, -lightDirection), 0.0);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
+	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
 
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadratic*(distance*distance));
 // Keep the A of texture's RGBA unchanged during light computing
-	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
-	vec4 specularTex = texture(material.texture_specular1,TexCoord);
+	vec4 diffuseTex = texture(material.texture_diffuse1, vs_result.TexCoord);
+	vec4 specularTex = texture(material.texture_specular1,vs_result.TexCoord);
 
 	vec3 ambient = light.ambient*vec3(diffuseTex);
 	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
@@ -126,9 +129,7 @@ vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 
 vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition)
 {
-	light.position = vec3( ViewMat * vec4(light.position,1.0));
-	light.direction = vec3( ViewMat * vec4(light.direction,0.0));
-	vec3 viewDirection = normalize(fragmentPosition);
+	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
 	vec3 lightDirection = normalize(fragmentPosition - light.position);
 	float theta = dot(lightDirection, normalize(light.direction));
 	float epsilon = light.cutOff - light.outerCutOff;
@@ -136,12 +137,12 @@ vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition)
 
 	float diff = max(dot(normal, -lightDirection), 0.0);
 	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
+	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadratic*(distance*distance));
 	
-	vec4 diffuseTex = texture(material.texture_diffuse1, TexCoord);
-	vec4 specularTex = texture(material.texture_specular1,TexCoord);
+	vec4 diffuseTex = texture(material.texture_diffuse1, vs_result.TexCoord);
+	vec4 specularTex = texture(material.texture_specular1,vs_result.TexCoord);
 
 	vec3 ambient = light.ambient*vec3(diffuseTex);
 	vec3 diffuse = light.diffuse*diff*vec3(diffuseTex);
