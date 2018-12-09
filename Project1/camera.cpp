@@ -1,8 +1,24 @@
 #include "camera.h"
 #include "GLFW/glfw3.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 static float DeltaTime = 0, LastFrame = 0;
+
+void Camera::updateCameraVectors()
+{
+	up = rotate * up;
+	front = rotate * front;
+	up = glm::normalize(up);
+	front = glm::normalize(front);
+	right = glm::cross(front, up);
+	CameraUp = up;
+	CameraFront = front;
+	CameraRight = right;
+	WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	rotate = glm::quat(1, 0, 0, 0);
+}
 
 void synchronizeMovementSpeed()
 {
@@ -11,20 +27,9 @@ void synchronizeMovementSpeed()
 	LastFrame = currentFrame;
 }
 
-void Camera::updateCameraVectors()
-{
-		glm::vec3 front;
-		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front.y = sin(glm::radians(pitch));
-		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		this->front = glm::normalize(front);
-		right = glm::normalize(glm::cross(this->front, worldUp));
-		cameraUp = glm::normalize(glm::cross(right, this->front));
-}
-
 glm::mat4 Camera::GetViewMatrix() const
 {
-		return glm::lookAt(position, position + front, cameraUp);
+		return glm::lookAt(position, position + CameraFront, CameraUp);
 }
 
 
@@ -32,7 +37,6 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 {
 
 	float velocity = movementSpeed * DeltaTime;
-
 	if (direction.Movement & CameraMovement::FORWARD)
 		position += front * velocity;
 	if (direction.Movement & CameraMovement::BACKWARD)
@@ -42,15 +46,16 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 	if (direction.Movement & CameraMovement::RIGHT_SHIFT)
 		position += right * velocity;
 	if (direction.Movement & CameraMovement::UPWARD)
-		position += worldUp * velocity;
+		position += up * velocity;
 	if (direction.Movement & CameraMovement::DOWNWARD)
-		position -= worldUp * velocity;
-	//if (direction.Movement & CameraMovement::LEFT_ROLL)
-		//worldUp -= right * velocity;
-	//if (direction.Movement & CameraMovement::RIGHT_ROLL)
-		//worldUp += right * velocity;
-
-	//updateCameraVectors();
+		position -= up * velocity;
+	if (direction.Movement & CameraMovement::LEFT_ROLL) {
+		rotate *= glm::angleAxis(glm::degrees(-mouseSensitivity), CameraFront);
+	}
+	if (direction.Movement & CameraMovement::RIGHT_ROLL) {
+		rotate *= glm::angleAxis(glm::degrees(mouseSensitivity), CameraFront);
+	}
+	updateCameraVectors();
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)
@@ -58,18 +63,8 @@ void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constr
 
 		xOffset *= mouseSensitivity;
 		yOffset *= mouseSensitivity;
-
-		yaw += xOffset;
-		pitch += yOffset;
-
-		if (constrainPitch)
-		{
-			if (pitch > 89.0f)
-				pitch = 89.0f;
-			if (pitch < -89.0f)
-				pitch = -89.0f;
-		}
-
+		rotate *= glm::angleAxis(glm::degrees(-xOffset), CameraUp);
+		rotate *= glm::angleAxis(glm::degrees(yOffset), CameraRight);
 		updateCameraVectors();
 }
 
@@ -82,4 +77,3 @@ void Camera::processMouseScroll(float yOffset)
 		if (zoom >= 45.0f)
 			zoom = 45.0f;
 }
-
