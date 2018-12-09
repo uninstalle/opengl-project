@@ -58,16 +58,21 @@ int main()
 
 	Model P51("resource/B-17E/B-17E.obj");
 
-	Shader vertexShader("VertexShader.vert", GL_VERTEX_SHADER);
-	Shader fragmentShader("FragmentShader.frag", GL_FRAGMENT_SHADER);
-	Shader lightFragmentShader("LightFragmentShader.frag", GL_FRAGMENT_SHADER);
+	Shader VS_BP_NT("B_Phong_NormalTex.vert", GL_VERTEX_SHADER);
+	Shader FS_BP_NT("B_Phong_NormalTex.frag", GL_FRAGMENT_SHADER);
+	Shader VS_BP("B_Phong.vert", GL_VERTEX_SHADER);
+	Shader FS_BP("B_Phong.frag", GL_FRAGMENT_SHADER);
+	Shader FS_L("Light.frag", GL_FRAGMENT_SHADER);
 
-	ShaderProgram shaderProgram;
-	shaderProgram.attachShader(vertexShader);
-	shaderProgram.attachShader(fragmentShader);
-	shaderProgram.linkShaders();
+	ShaderProgram shaderNT;
+	shaderNT.attachShader(VS_BP_NT);
+	shaderNT.attachShader(FS_BP_NT);
+	shaderNT.linkShaders();
 
-	ShaderProgram lightShader{ vertexShader,lightFragmentShader };
+	ShaderProgram shaderT{ VS_BP,FS_BP };
+	shaderT.linkShaders();
+
+	ShaderProgram lightShader{ VS_BP,FS_L };
 	lightShader.linkShaders();
 
 
@@ -106,28 +111,35 @@ int main()
 		CameraMatrix.projection = glm::perspective(glm::radians(camera.getZoom()), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
 
 
-
-		shaderProgram.use();
-		shaderProgram.setVec3f(camera.getPosition(), "ViewPosition");
-		shaderProgram.setMat4f(CameraMatrix.view, "view");
-		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
-		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-		shaderProgram.setMat4f(model, "model");
-		P51.draw(shaderProgram);
-
-		shaderProgram.use();
-		shaderProgram.setMat4f(CameraMatrix.view, "view");
-		shaderProgram.setMat4f(CameraMatrix.projection, "projection");
 		glm::vec3 pointPos = glm::vec3(cos(glfwGetTime()), 0.0f, sin(glfwGetTime()));
 		poiL.setPosition(pointPos);
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
-		//dirL.apply(shaderProgram);
-		poiL.apply(shaderProgram);
-		spoL.apply(shaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgram.getID(), "numOfSpotLights"), isSpotLightOn);
+
+		shaderNT.use();
+		shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+		shaderNT.setMat4f(CameraMatrix.view, "view");
+		shaderNT.setMat4f(CameraMatrix.projection, "projection");
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		shaderNT.setMat4f(model, "model");
+		//dirL.apply(shaderNT);
+		poiL.apply(shaderNT);
+		spoL.apply(shaderNT);
+		glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+
+		shaderT.use();
+		shaderT.setMat4f(CameraMatrix.view, "view");
+		shaderT.setMat4f(CameraMatrix.projection, "projection");
+		shaderT.setMat4f(model, "model");
+		//dirL.apply(shaderT);
+		poiL.apply(shaderT);
+		spoL.apply(shaderT);
+		glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
+
+		P51.draw(shaderT,shaderNT);
+
 
 		lightShader.use();
 		glm::mat4 lightModel(1.0f);
@@ -136,7 +148,7 @@ int main()
 		lightShader.setMat4f(CameraMatrix.view, "view");
 		lightShader.setMat4f(CameraMatrix.projection, "projection");
 		lightShader.setMat4f(lightModel, "model");
-		P51.draw(lightShader);
+		P51.draw(lightShader, lightShader);
 
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);

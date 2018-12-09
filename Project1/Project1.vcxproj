@@ -140,7 +140,7 @@
     <ClCompile Include="..\..\..\..\..\..\libs\glad\glad.c" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
-    <Text Include="LightFragmentShader.frag">
+    <Text Include="Light.frag">
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="light.cpp" />
@@ -153,10 +153,10 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="FragmentShader.frag">
+    <Text Include="B_Phong_NormalTex.frag">
       <FileType>Document</FileType>
     </Text>
-    <Text Include="VertexShader.vert">
+    <Text Include="B_Phong_NormalTex.vert">
       <FileType>Document</FileType>
     </Text>
   </ItemGroup>
@@ -172,10 +172,12 @@
     <ClInclude Include="skybox.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CubeMapFragmentShader.frag" />
-    <None Include="CubeMapVertexShader.vert" />
-    <None Include="PostEffectFragmentShader.frag" />
-    <None Include="PostEffectVertexShader.vert" />
+    <None Include="B_Phong.frag" />
+    <None Include="B_Phong.vert" />
+    <None Include="CubeMap.frag" />
+    <None Include="CubeMap.vert" />
+    <None Include="PostEffect.frag" />
+    <None Include="PostEffect.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,6 +27,7 @@ private:
 	unsigned VAO;
 	unsigned VBO;
 	unsigned EBO;
+	bool isNormalTextured;
 	void setupMesh();
 public:
 	std::vector<Vertex> vertices;
@@ -39,6 +40,7 @@ public:
 		setupMesh();
 	}
 	void draw(ShaderProgram &shader);
+	bool hasNormalTex() const { return isNormalTextured; };
 
 };
 

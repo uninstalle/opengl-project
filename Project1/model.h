@@ -16,7 +16,7 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial *material, aiTextureType textureType, int type);
 public:
 	Model(const char *path);
-	void draw(ShaderProgram &shader);
+	void draw(ShaderProgram &shader,ShaderProgram &shaderNT);
 };
 
 

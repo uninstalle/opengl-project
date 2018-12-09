@@ -1,8 +1,6 @@
 #include "camera.h"
 #include "GLFW/glfw3.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 static float DeltaTime = 0, LastFrame = 0;
 
@@ -37,6 +35,7 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 {
 
 	float velocity = movementSpeed * DeltaTime;
+	float rollV = 0.01*velocity;
 	if (direction.Movement & CameraMovement::FORWARD)
 		position += front * velocity;
 	if (direction.Movement & CameraMovement::BACKWARD)
@@ -50,10 +49,10 @@ void Camera::processKeyboardMovement(CameraMovement direction)
 	if (direction.Movement & CameraMovement::DOWNWARD)
 		position -= up * velocity;
 	if (direction.Movement & CameraMovement::LEFT_ROLL) {
-		rotate *= glm::angleAxis(glm::degrees(-mouseSensitivity), CameraFront);
+		rotate *= glm::angleAxis(glm::degrees(-rollV), CameraFront);
 	}
 	if (direction.Movement & CameraMovement::RIGHT_ROLL) {
-		rotate *= glm::angleAxis(glm::degrees(mouseSensitivity), CameraFront);
+		rotate *= glm::angleAxis(glm::degrees(rollV), CameraFront);
 	}
 	updateCameraVectors();
 }

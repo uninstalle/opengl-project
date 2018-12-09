@@ -59,13 +59,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="VertexShader.vert">
+    <Text Include="Light.frag">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="FragmentShader.frag">
+    <Text Include="B_Phong_NormalTex.frag">
       <Filter>Shader</Filter>
     </Text>
-    <Text Include="LightFragmentShader.frag">
+    <Text Include="B_Phong_NormalTex.vert">
       <Filter>Shader</Filter>
     </Text>
   </ItemGroup>
@@ -99,16 +99,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostEffectVertexShader.vert">
+    <None Include="B_Phong.frag">
       <Filter>Shader</Filter>
     </None>
-    <None Include="PostEffectFragmentShader.frag">
+    <None Include="CubeMap.frag">
       <Filter>Shader</Filter>
     </None>
-    <None Include="CubeMapFragmentShader.frag">
+    <None Include="CubeMap.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="CubeMapVertexShader.vert">
+    <None Include="PostEffect.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="PostEffect.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="B_Phong.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

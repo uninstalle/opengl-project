@@ -24,17 +24,29 @@ void Mesh::setupMesh()
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned), &indices[0], GL_STATIC_DRAW);
 
+	isNormalTextured = false;
+	for (auto &i: textures)
+	{
+		if (i.type == Texture::NORMAL)
+		{
+			isNormalTextured = true; 
+			break;
+		}
+	}
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(0));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Normal)));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, Tangent)));
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, BiTangent)));
-
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	glEnableVertexAttribArray(3);
-	glEnableVertexAttribArray(4);
+
+	if (isNormalTextured) {
+		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
+	}
 
 	glBindVertexArray(0);
 }
@@ -44,6 +56,7 @@ void Mesh::draw(ShaderProgram &shader)
 	unsigned diffuse = 0;
 	unsigned specular = 0;
 	unsigned normal = 0;
+	shader.use();
 	for (int i = 0; i < textures.size(); ++i)
 	{
 		std::string name = "material.";

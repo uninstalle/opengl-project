@@ -44,6 +44,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	std::vector<Vertex> vertices;
 	std::vector<unsigned> indices;
 	std::vector<Texture> textures;
+
+
 	for (int i = 0; i < mesh->mNumVertices; ++i)
 	{
 		Vertex vertex;
@@ -61,8 +63,20 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
 		if (mesh->HasTangentsAndBitangents())
 		{
-			vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-			vertex.BiTangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+			auto tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+			auto biTangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+			auto normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+			if (glm::dot(glm::cross(tangent, biTangent), normal) < 0)
+			{
+				vertex.Tangent = tangent;
+				vertex.BiTangent = -biTangent;
+			}
+			else 
+			{
+				vertex.Tangent = tangent;
+				vertex.BiTangent = biTangent;
+			}
+
 		}
 		else
 			vertex.Tangent = vertex.BiTangent = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -120,10 +134,13 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* material, aiTexture
 	return textures;
 }
 
-void Model::draw(ShaderProgram &shader)
+void Model::draw(ShaderProgram &shader, ShaderProgram &shaderNT)
 {
 	for (auto &i : meshes)
 	{
-		i.draw(shader);
+		if (i.hasNormalTex())
+			i.draw(shader);
+		else
+			i.draw(shader);
 	}
 }

@@ -12,8 +12,8 @@ static unsigned SkyboxTexture;
 
 static void initializeSkyboxShader()
 {
-	Shader vShader("CubeMapVertexShader.vert", GL_VERTEX_SHADER);
-	Shader fShader("CubeMapFragmentShader.frag", GL_FRAGMENT_SHADER);
+	Shader vShader("CubeMap.vert", GL_VERTEX_SHADER);
+	Shader fShader("CubeMap.frag", GL_FRAGMENT_SHADER);
 	SkyboxShader = new ShaderProgram{ vShader,fShader };
 	SkyboxShader->linkShaders();
 }

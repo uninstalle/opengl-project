@@ -69,8 +69,9 @@ void main()
 	TexCoord = VertexTextureCoordinate;
 
 	vec3 T = normalize(vec3(model*vec4(VertexTangent,0.0)));
-	vec3 B = normalize(vec3(model*vec4(VertexBiTangent,0.0)));
 	vec3 N = normalize(vec3(model*vec4(VertexNormal,0.0)));
+	T = normalize(T - dot(T, N) * N);
+	vec3 B = cross(T, N);
 	mat3 TBN = transpose(mat3(T,B,N));
 
 	FragPos = TBN * vec3(model * vec4(VertexPosition, 1.0));

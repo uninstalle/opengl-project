@@ -41,8 +41,8 @@ static void initializeVAOForScreenFrameBuffer()
 
 static void initializePostEffectShader()
 {
-	Shader vShader("PostEffectVertexShader.vert", GL_VERTEX_SHADER);
-	Shader fShader("PostEffectFragmentShader.frag", GL_FRAGMENT_SHADER);
+	Shader vShader("PostEffect.vert", GL_VERTEX_SHADER);
+	Shader fShader("PostEffect.frag", GL_FRAGMENT_SHADER);
 	PostEffectShader = new ShaderProgram{ vShader, fShader };
 	PostEffectShader->linkShaders();
 }

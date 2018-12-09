@@ -2,7 +2,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 struct CameraMovement
 {
@@ -56,7 +55,7 @@ public:
 			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f)
 			):
-		position(position), front(front), up(up), rotate(glm::quat(1, 0, 0, 0)),
+		position(position),  up(up), front(front), rotate(glm::quat(1, 0, 0, 0)),
 		movementSpeed(DefaultSpeed), mouseSensitivity(DefaultSensitivity), zoom(DefaultZoom)
 	{
 		updateCameraVectors();
