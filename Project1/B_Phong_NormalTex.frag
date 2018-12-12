@@ -44,7 +44,6 @@ out vec4 FragColor;
 in VERTEX_OUT {
 	in vec2 TexCoord;
 	in vec3 FragPos;
-	in vec3 ViewPos;
 } vs_result;
 
 uniform Material material;
@@ -76,8 +75,8 @@ void main()
 	if (numOfSpotLights>0)
 		result += CalSpotLight(fSpotLight, normal, vs_result.FragPos);
 
-	//FragColor = vec4(normal,1.0);
-	FragColor = result;
+	FragColor = vec4(normal,1.0);
+	//FragColor = result;
 }
 
 
@@ -85,9 +84,9 @@ vec4 CalDirLight(DirLight light, vec3 normal, vec3 fragmentPosition)
 {
 	vec3 lightDirection = normalize(light.position);
 	float diff = max(dot(normal, -lightDirection), 0.0);
-	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
-	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
+	vec3 viewDirection = normalize(fragmentPosition);
+	vec3 halfwayDirection = -normalize(lightDirection + viewDirection);
+	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
 
 	vec4 diffuseTex = texture(material.texture_diffuse1, vs_result.TexCoord);
 	vec4 specularTex = texture(material.texture_specular1,vs_result.TexCoord);
@@ -103,12 +102,12 @@ vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 {
 // Calculate light in tangent space
 // viewDirection: From viewer's position to fragment position
-	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
+	vec3 viewDirection = normalize(fragmentPosition);
 // lightDirection: From light source to fragment position
 	vec3 lightDirection = normalize(fragmentPosition - light.position);
 	float diff = max(dot(normal, -lightDirection), 0.0);
-	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
+	vec3 halfwayDirection = -normalize(lightDirection + viewDirection);
+	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
 
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadratic*(distance*distance));
@@ -129,15 +128,15 @@ vec4 CalPointLight(PointLight light, vec3 normal, vec3 fragmentPosition)
 
 vec4 CalSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition)
 {
-	vec3 viewDirection = normalize(fragmentPosition - vs_result.ViewPos);
+	vec3 viewDirection = normalize(fragmentPosition);
 	vec3 lightDirection = normalize(fragmentPosition - light.position);
 	float theta = dot(lightDirection, normalize(light.direction));
 	float epsilon = light.cutOff - light.outerCutOff;
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
 	float diff = max(dot(normal, -lightDirection), 0.0);
-	vec3 halfwayDirection = normalize(lightDirection + viewDirection);
-	float spec = pow(max(dot(normal, -halfwayDirection), 0.0), material.shininess);
+	vec3 halfwayDirection = -normalize(lightDirection + viewDirection);
+	float spec = pow(max(dot(normal, halfwayDirection), 0.0), material.shininess);
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear*distance + light.quadratic*(distance*distance));
 	

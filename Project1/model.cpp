@@ -68,18 +68,16 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			auto normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 			if (glm::dot(glm::cross(tangent, biTangent), normal) < 0)
 			{
-				vertex.Tangent = tangent;
-				vertex.BiTangent = -biTangent;
+				vertex.Tangent = glm::vec4(tangent,-1);
 			}
 			else 
 			{
-				vertex.Tangent = tangent;
-				vertex.BiTangent = biTangent;
+				vertex.Tangent = glm::vec4(tangent, 1);
 			}
 
 		}
 		else
-			vertex.Tangent = vertex.BiTangent = glm::vec3(0.0f, 0.0f, 0.0f);
+			vertex.Tangent = glm::vec4(0.0f);
 
 		vertices.push_back(vertex);
 	}
@@ -139,7 +137,7 @@ void Model::draw(ShaderProgram &shader, ShaderProgram &shaderNT)
 	for (auto &i : meshes)
 	{
 		if (i.hasNormalTex())
-			i.draw(shader);
+			i.draw(shaderNT);
 		else
 			i.draw(shader);
 	}

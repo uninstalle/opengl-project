@@ -1,0 +1,50 @@
+newmtl _default_
+Kd 0.502 0.502 0.502 
+Ks 0.067 0.067 0.067 
+Ns 30
+
+newmtl material_1_543
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/p_51h_10_1947_a.jpg
+map_Ks textures/p_51h_10_1947_s.jpg
+map_Bump textures/p_51h_10_1947_n.jpg
+
+newmtl material_6_544
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/p_51d_inside_a.jpg
+map_Ks textures/p_51d_inside_s.jpg
+map_Bump textures/p_51d_inside_n.jpg
+
+newmtl material_2_544
+Kd 0.502 0.502 0.502 
+Ks 0.753 0.753 0.753 
+Ns 100
+
+newmtl material_9_545
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/p_51h_10_1947_pylon_a.jpg
+map_Ks textures/p_51h_10_1947_pylon_s.jpg
+map_Bump textures/p_51h_10_1947_pylon_n.jpg
+
+newmtl material_12_545
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/browning_m2_50_fixed_a.jpg
+map_Ks textures/browning_m2_50_fixed_s.jpg
+map_Bump textures/browning_m2_50_fixed_n.jpg
+
+newmtl material_15_545
+Kd 0.502 0.502 0.502 
+Ks 0.251 0.251 0.251 
+Ns 48
+map_Kd textures/m10_bazooka_c.jpg
+map_Ks textures/m10_bazooka_s.jpg
+map_Bump textures/m10_bazooka_n.jpg
+

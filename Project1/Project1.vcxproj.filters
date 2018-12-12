@@ -117,5 +117,11 @@
     <None Include="B_Phong.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="TangentSpace_display.geom">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Normal_display.geom">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

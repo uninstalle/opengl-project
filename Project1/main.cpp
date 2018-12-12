@@ -56,18 +56,22 @@ int main()
 	glfwSetScrollCallback(Window, scrollCallback);
 
 
-	Model P51("resource/B-17E/B-17E.obj");
+	Model testModel("resource/car/car.obj");
 
 	Shader VS_BP_NT("B_Phong_NormalTex.vert", GL_VERTEX_SHADER);
 	Shader FS_BP_NT("B_Phong_NormalTex.frag", GL_FRAGMENT_SHADER);
 	Shader VS_BP("B_Phong.vert", GL_VERTEX_SHADER);
 	Shader FS_BP("B_Phong.frag", GL_FRAGMENT_SHADER);
 	Shader FS_L("Light.frag", GL_FRAGMENT_SHADER);
+	Shader TANSP_DISP("TangentSpace_display.geom", GL_GEOMETRY_SHADER);
 
 	ShaderProgram shaderNT;
 	shaderNT.attachShader(VS_BP_NT);
 	shaderNT.attachShader(FS_BP_NT);
 	shaderNT.linkShaders();
+
+	ShaderProgram shaderTanSp{ VS_BP_NT,TANSP_DISP,FS_L };
+	shaderTanSp.linkShaders();
 
 	ShaderProgram shaderT{ VS_BP,FS_BP };
 	shaderT.linkShaders();
@@ -129,6 +133,14 @@ int main()
 		spoL.apply(shaderNT);
 		glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
 
+		glDisable(GL_CULL_FACE);
+		shaderTanSp.use();
+		shaderTanSp.setMat4f(CameraMatrix.view, "view");
+		shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+		shaderTanSp.setMat4f(model, "model");
+		//P51.draw(shaderTanSp, shaderTanSp);
+
+		glEnable(GL_CULL_FACE);
 		shaderT.use();
 		shaderT.setMat4f(CameraMatrix.view, "view");
 		shaderT.setMat4f(CameraMatrix.projection, "projection");
@@ -138,7 +150,7 @@ int main()
 		spoL.apply(shaderT);
 		glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
 
-		P51.draw(shaderT,shaderNT);
+		testModel.draw(shaderT,shaderNT);
 
 
 		lightShader.use();
@@ -148,7 +160,7 @@ int main()
 		lightShader.setMat4f(CameraMatrix.view, "view");
 		lightShader.setMat4f(CameraMatrix.projection, "projection");
 		lightShader.setMat4f(lightModel, "model");
-		P51.draw(lightShader, lightShader);
+		testModel.draw(lightShader, lightShader);
 
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);

@@ -176,8 +176,10 @@
     <None Include="B_Phong.vert" />
     <None Include="CubeMap.frag" />
     <None Include="CubeMap.vert" />
+    <None Include="Normal_display.geom" />
     <None Include="PostEffect.frag" />
     <None Include="PostEffect.vert" />
+    <None Include="TangentSpace_display.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
