@@ -56,7 +56,7 @@ int main()
 	glfwSetScrollCallback(Window, scrollCallback);
 
 
-	Model testModel("resource/car/car.obj");
+	//Model testModel("resource/car/car.obj");
 
 	Shader VS_BP_NT("B_Phong_NormalTex.vert", GL_VERTEX_SHADER);
 	Shader FS_BP_NT("B_Phong_NormalTex.frag", GL_FRAGMENT_SHADER);
@@ -93,7 +93,7 @@ int main()
 
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 
-
+	Model P51("resource/P-51H-5NA/P-51H-5NA.obj");
 
 	while (!glfwWindowShouldClose(Window))
 	{
@@ -119,14 +119,12 @@ int main()
 		poiL.setPosition(pointPos);
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
-
+		
 		shaderNT.use();
 		shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
 		shaderNT.setMat4f(CameraMatrix.view, "view");
 		shaderNT.setMat4f(CameraMatrix.projection, "projection");
-		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		glm::mat4 model = camera.model();
 		shaderNT.setMat4f(model, "model");
 		//dirL.apply(shaderNT);
 		poiL.apply(shaderNT);
@@ -138,7 +136,7 @@ int main()
 		shaderTanSp.setMat4f(CameraMatrix.view, "view");
 		shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
 		shaderTanSp.setMat4f(model, "model");
-		//P51.draw(shaderTanSp, shaderTanSp);
+		P51.draw(shaderTanSp, shaderTanSp);
 
 		glEnable(GL_CULL_FACE);
 		shaderT.use();
@@ -150,7 +148,7 @@ int main()
 		spoL.apply(shaderT);
 		glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
 
-		testModel.draw(shaderT,shaderNT);
+		//testModel.draw(shaderT,shaderNT);
 
 
 		lightShader.use();
@@ -160,7 +158,7 @@ int main()
 		lightShader.setMat4f(CameraMatrix.view, "view");
 		lightShader.setMat4f(CameraMatrix.projection, "projection");
 		lightShader.setMat4f(lightModel, "model");
-		testModel.draw(lightShader, lightShader);
+		//testModel.draw(lightShader, lightShader);
 
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);
@@ -251,11 +249,11 @@ void processCameraMovement(GLFWwindow *window)
 	{
 		cameraMovement.Movement |= CameraMovement::RIGHT_SHIFT;
 	}
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		cameraMovement.Movement |= CameraMovement::LEFT_ROLL;
 	}
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		cameraMovement.Movement |= CameraMovement::RIGHT_ROLL;
 	}
