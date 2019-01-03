@@ -11,6 +11,7 @@
 #include "model.h"
 #include "posteffect.h"
 #include "skybox.h"
+#include "fighter.h"
 
 
 
@@ -21,7 +22,8 @@ float lastX = SCREEN_WIDTH / 2, lastY = SCREEN_HEIGHT / 2;
 
 int isSpotLightOn = 0;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera;
+Fighter myfighter;
 CameraTransformMatrix CameraMatrix;
 
 GLFWwindow* initGLFWWindow();
@@ -94,6 +96,7 @@ int main()
 	glClearColor(0.2f, 0.2f, 0.0f, 1.0f);
 
 	Model P51("resource/P-51H-5NA/P-51H-5NA.obj");
+	camera.setFighter(&myfighter);
 
 	while (!glfwWindowShouldClose(Window))
 	{
@@ -120,23 +123,43 @@ int main()
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
 		
-		shaderNT.use();
-		shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
-		shaderNT.setMat4f(CameraMatrix.view, "view");
-		shaderNT.setMat4f(CameraMatrix.projection, "projection");
-		glm::mat4 model = camera.model();
-		shaderNT.setMat4f(model, "model");
-		//dirL.apply(shaderNT);
-		poiL.apply(shaderNT);
-		spoL.apply(shaderNT);
-		glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+			shaderNT.use();
+			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+			shaderNT.setMat4f(CameraMatrix.view, "view");
+			shaderNT.setMat4f(CameraMatrix.projection, "projection");
+			glm::mat4 model = myfighter.model();
+			shaderNT.setMat4f(model, "model");
+			//dirL.apply(shaderNT);
+			poiL.apply(shaderNT);
+			spoL.apply(shaderNT);
+			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
 
-		glDisable(GL_CULL_FACE);
-		shaderTanSp.use();
-		shaderTanSp.setMat4f(CameraMatrix.view, "view");
-		shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
-		shaderTanSp.setMat4f(model, "model");
-		P51.draw(shaderTanSp, shaderTanSp);
+			glDisable(GL_CULL_FACE);
+			shaderTanSp.use();
+			shaderTanSp.setMat4f(CameraMatrix.view, "view");
+			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+			shaderTanSp.setMat4f(model, "model");
+			P51.draw(shaderTanSp, shaderTanSp);
+		
+		{
+			shaderNT.use();
+			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+			shaderNT.setMat4f(CameraMatrix.view, "view");
+			shaderNT.setMat4f(CameraMatrix.projection, "projection");
+			glm::mat4 model(1.0f);
+			shaderNT.setMat4f(model, "model");
+			//dirL.apply(shaderNT);
+			poiL.apply(shaderNT);
+			spoL.apply(shaderNT);
+			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+
+			glDisable(GL_CULL_FACE);
+			shaderTanSp.use();
+			shaderTanSp.setMat4f(CameraMatrix.view, "view");
+			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+			shaderTanSp.setMat4f(model, "model");
+			P51.draw(shaderTanSp, shaderTanSp);
+		}
 
 		glEnable(GL_CULL_FACE);
 		shaderT.use();
@@ -232,41 +255,41 @@ void processInput(GLFWwindow *window)
 void processCameraMovement(GLFWwindow *window)
 {
 
-	CameraMovement cameraMovement;
+	FighterMovement fighterMovement;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::FORWARD;
+		fighterMovement.Movement |= FighterMovement::FORWARD;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::BACKWARD;
+		fighterMovement.Movement |= FighterMovement::BACKWARD;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::LEFT_SHIFT;
+		fighterMovement.Movement |= FighterMovement::LEFT_SHIFT;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::RIGHT_SHIFT;
+		fighterMovement.Movement |= FighterMovement::RIGHT_SHIFT;
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::LEFT_ROLL;
+		fighterMovement.Movement |= FighterMovement::LEFT_ROLL;
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::RIGHT_ROLL;
+		fighterMovement.Movement |= FighterMovement::RIGHT_ROLL;
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::UPWARD;
+		fighterMovement.Movement |= FighterMovement::UPWARD;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
-		cameraMovement.Movement |= CameraMovement::DOWNWARD;
+		fighterMovement.Movement |= FighterMovement::DOWNWARD;
 	}
 
-	camera.processKeyboardMovement(cameraMovement);
+	myfighter.processKeyboardMovement(fighterMovement);
 }
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -283,7 +306,6 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 	camera.processMouseMovement(xOffset, yOffset);
-
 }
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
