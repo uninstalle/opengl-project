@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <set>
 
 struct FighterMovement
 {
@@ -51,7 +52,7 @@ public:
 		position(position), front(front), worldUp(0.0f, 1.0f, 0.0f),
 		speed(DefaultSpeed), rollSpeed(DefaultRollSpeed), pitchSpeed(DefaultPitchSpeed), yawSpeed(DefaultYawSpeed),
 		pushSpeed(DefaultPushSpeed),
-		roll(0.0f), pitch(0.0f), push(0.0f)
+		roll(0.0f), pitch(0.0f), push(0.0f), mode(0)
 	{
 		update();
 	}
@@ -67,7 +68,21 @@ public:
 	//void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
 	//void processMouseScroll(float yOffset);
 	glm::mat4 model();
+
+	int mode;
 };
+
+class Fighters {
+public:
+	Fighter* fighter;
+	std::set<Fighter*> fighters;
+	static constexpr int MaxFighterNum = 5;
+	Fighters(Fighter* fighter) : fighter(fighter)
+	{
+	}
+	void update();
+};
+
 
 void synchronizeMovementSpeed();
 

@@ -97,13 +97,14 @@ int main()
 
 	Model P51("resource/P-51H-5NA/P-51H-5NA.obj");
 	camera.setFighter(&myfighter);
+	Fighters fighters(&myfighter);
 
 	while (!glfwWindowShouldClose(Window))
 	{
 		//inputting
 		processInput(Window);
+		fighters.update();
 		synchronizeMovementSpeed();
-
 		enableScreenFrameBuffer();
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -123,43 +124,24 @@ int main()
 		spoL.setPosition(camera.getPosition());
 		spoL.setDirection(camera.getFront());
 		
-			shaderNT.use();
-			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
-			shaderNT.setMat4f(CameraMatrix.view, "view");
-			shaderNT.setMat4f(CameraMatrix.projection, "projection");
-			glm::mat4 model = myfighter.model();
-			shaderNT.setMat4f(model, "model");
-			//dirL.apply(shaderNT);
-			poiL.apply(shaderNT);
-			spoL.apply(shaderNT);
-			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
-
-			glDisable(GL_CULL_FACE);
-			shaderTanSp.use();
-			shaderTanSp.setMat4f(CameraMatrix.view, "view");
-			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
-			shaderTanSp.setMat4f(model, "model");
-			P51.draw(shaderTanSp, shaderTanSp);
 		
-		{
-			shaderNT.use();
-			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
-			shaderNT.setMat4f(CameraMatrix.view, "view");
-			shaderNT.setMat4f(CameraMatrix.projection, "projection");
-			glm::mat4 model(1.0f);
-			shaderNT.setMat4f(model, "model");
-			//dirL.apply(shaderNT);
-			poiL.apply(shaderNT);
-			spoL.apply(shaderNT);
-			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+		shaderNT.use();
+		shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+		shaderNT.setMat4f(CameraMatrix.view, "view");
+		shaderNT.setMat4f(CameraMatrix.projection, "projection");
+		glm::mat4 model = myfighter.model();
+		shaderNT.setMat4f(model, "model");
+		//dirL.apply(shaderNT);
+		poiL.apply(shaderNT);
+		spoL.apply(shaderNT);
+		glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
 
-			glDisable(GL_CULL_FACE);
-			shaderTanSp.use();
-			shaderTanSp.setMat4f(CameraMatrix.view, "view");
-			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
-			shaderTanSp.setMat4f(model, "model");
-			P51.draw(shaderTanSp, shaderTanSp);
-		}
+		glDisable(GL_CULL_FACE);
+		shaderTanSp.use();
+		shaderTanSp.setMat4f(CameraMatrix.view, "view");
+		shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+		shaderTanSp.setMat4f(model, "model");
+		//P51.draw(shaderTanSp, shaderTanSp);
 
 		glEnable(GL_CULL_FACE);
 		shaderT.use();
@@ -170,9 +152,7 @@ int main()
 		poiL.apply(shaderT);
 		spoL.apply(shaderT);
 		glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
-
-		//testModel.draw(shaderT,shaderNT);
-
+		//P51.draw(shaderT,shaderNT);
 
 		lightShader.use();
 		glm::mat4 lightModel(1.0f);
@@ -181,8 +161,48 @@ int main()
 		lightShader.setMat4f(CameraMatrix.view, "view");
 		lightShader.setMat4f(CameraMatrix.projection, "projection");
 		lightShader.setMat4f(lightModel, "model");
-		//testModel.draw(lightShader, lightShader);
+		P51.draw(lightShader, lightShader);
 
+
+		for (const auto &it : fighters.fighters) {
+			shaderNT.use();
+			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+			shaderNT.setMat4f(CameraMatrix.view, "view");
+			shaderNT.setMat4f(CameraMatrix.projection, "projection");
+			glm::mat4 model = it->model();
+			shaderNT.setMat4f(model, "model");
+			//dirL.apply(shaderNT);
+			poiL.apply(shaderNT);
+			spoL.apply(shaderNT);
+			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+
+			glDisable(GL_CULL_FACE);
+			shaderTanSp.use();
+			shaderTanSp.setMat4f(CameraMatrix.view, "view");
+			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+			shaderTanSp.setMat4f(model, "model");
+			//P51.draw(shaderTanSp, shaderTanSp);
+
+			glEnable(GL_CULL_FACE);
+			shaderT.use();
+			shaderT.setMat4f(CameraMatrix.view, "view");
+			shaderT.setMat4f(CameraMatrix.projection, "projection");
+			shaderT.setMat4f(model, "model");
+			//dirL.apply(shaderT);
+			poiL.apply(shaderT);
+			spoL.apply(shaderT);
+			glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
+			//P51.draw(shaderT,shaderNT);
+
+			lightShader.use();
+			glm::mat4 lightModel(1.0f);
+			lightModel = glm::translate(lightModel, pointPos);
+			lightModel = glm::scale(lightModel, glm::vec3(0.01f, 0.01f, 0.01f));
+			lightShader.setMat4f(CameraMatrix.view, "view");
+			lightShader.setMat4f(CameraMatrix.projection, "projection");
+			lightShader.setMat4f(lightModel, "model");
+			P51.draw(lightShader, lightShader);
+		}
 
 		drawSkybox(CameraMatrix.view, CameraMatrix.projection);
 

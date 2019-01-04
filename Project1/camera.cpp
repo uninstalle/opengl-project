@@ -5,6 +5,13 @@
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)
 {
+	static float DeltaTime = 0, LastFrame = 0;
+	float currentFrame = glfwGetTime();
+	DeltaTime = currentFrame - LastFrame;
+	LastFrame = currentFrame;
+
+	//yaw *= pow(0.9f, DeltaTime);
+
 	xOffset *= mouseSensitivity;
 	yOffset *= mouseSensitivity * 0.1;
 	yaw -= xOffset;

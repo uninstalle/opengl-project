@@ -43,18 +43,19 @@ void Fighter::processKeyboardMovement(FighterMovement direction)
 	}
 	if (direction.Movement & FighterMovement::LEFT_SHIFT) {
 		yaw += yawSpeed * DeltaTime;
-		if (yaw > 10.0f) yaw = 10.0f;
+		if (yaw > 20.0f) yaw = 20.0f;
 	}
 	if (direction.Movement & FighterMovement::RIGHT_SHIFT) {
 		yaw -= yawSpeed * DeltaTime;
-		if (yaw < -10.0f) yaw = 10.0f;
+		if (yaw < -20.0f) yaw = -20.0f;
 	}
 	update();
 }
 glm::mat4 Fighter::model() {
+	yaw *= pow(0.5f, DeltaTime);
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, position);
-	std::cout << position.x << " " << position.y << " " << position.z << " " << std::endl;
+	//std::cout << position.x << " " << position.y << " " << position.z << " " << std::endl;
 	model = glm::rotate(model, glm::radians(-pitch), glm::cross(worldUp, front));
 	model = glm::rotate(model, glm::radians(roll), front);
 	model = glm::rotate(model, atan2f(front.x, front.z), worldUp);
@@ -62,7 +63,6 @@ glm::mat4 Fighter::model() {
 	return model;
 }
 void Fighter::update() {
-	yaw *= pow(0.5f, DeltaTime);
 	front = glm::normalize(
 		glm::angleAxis(glm::radians(DeltaTime * (yaw - roll)), worldUp) * front
 	);
@@ -71,4 +71,28 @@ void Fighter::update() {
 	position += front * speed * DeltaTime;
 	position += worldUp * glm::sin(glm::radians(pitch)) * speed * DeltaTime;
 	position += glm::cross(front, worldUp) * glm::sin(glm::radians(yaw)) * speed * DeltaTime;
+}
+
+void Fighters::update() {
+	if (fighters.size() < MaxFighterNum) {
+		float rd = float(rand()) / RAND_MAX;
+		if (rd < pow(MaxFighterNum - fighters.size(), 1)) {
+			glm::vec3 front = glm::vec3(sin(rd * glm::pi<float>() * 2), 0.0f, cos(rd * glm::pi<float>() * 2));
+			fighters.insert(new Fighter(fighter->getPosition() - front * 20.0f, front));
+		}
+	}
+	for (auto it = fighters.begin(); it != fighters.end();) {
+		if (glm::length((*it)->getPosition() - fighter->getPosition()) > 30.0f){
+			delete *it;
+			it = fighters.erase(it);
+			continue;
+		}
+		FighterMovement fighterMovement;
+		if (fighter->getPosition().y > (*it)->getPosition().y) fighterMovement.Movement |= FighterMovement::UPWARD;
+		else fighterMovement.Movement |= FighterMovement::DOWNWARD;
+		if (glm::cross((*it)->getFront(), fighter->getPosition() - (*it)->getPosition()).y < 0) fighterMovement.Movement |= FighterMovement::RIGHT_SHIFT;
+		else fighterMovement.Movement |= FighterMovement::LEFT_SHIFT;
+		(*it)->processKeyboardMovement(fighterMovement);
+		it++;
+	}
 }
