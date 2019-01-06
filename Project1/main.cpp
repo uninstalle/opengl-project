@@ -12,10 +12,11 @@
 #include "posteffect.h"
 #include "skybox.h"
 #include "fighter.h"
+#include "sync.h"
+#include "ammunition.h"
 
 
-
-constexpr float SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080;
+constexpr float SCREEN_WIDTH = 480, SCREEN_HEIGHT = 270;
 GLFWwindow *Window = nullptr;
 
 float lastX = SCREEN_WIDTH / 2, lastY = SCREEN_HEIGHT / 2;
@@ -25,6 +26,7 @@ int isSpotLightOn = 0;
 Camera camera;
 Fighter myfighter;
 CameraTransformMatrix CameraMatrix;
+Ammunitions ammunitions;
 
 GLFWwindow* initGLFWWindow();
 void initGLAD();
@@ -34,7 +36,7 @@ void processInput(GLFWwindow *window);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processCameraMovement(GLFWwindow *window);
-
+void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
 
 
 int main()
@@ -56,7 +58,7 @@ int main()
 	glfwSetFramebufferSizeCallback(Window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(Window, mouseCallback);
 	glfwSetScrollCallback(Window, scrollCallback);
-
+	glfwSetMouseButtonCallback(Window, mouseButtonCallback);
 
 	//Model testModel("resource/car/car.obj");
 
@@ -103,8 +105,13 @@ int main()
 	{
 		//inputting
 		processInput(Window);
+		
+		camera.update();
 		fighters.update();
-		synchronizeMovementSpeed();
+		ammunitions.update();
+		check(fighters.fighters, ammunitions.ammunitions);
+
+		synchronizeTime();
 		enableScreenFrameBuffer();
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -165,6 +172,46 @@ int main()
 
 
 		for (const auto &it : fighters.fighters) {
+			shaderNT.use();
+			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
+			shaderNT.setMat4f(CameraMatrix.view, "view");
+			shaderNT.setMat4f(CameraMatrix.projection, "projection");
+			glm::mat4 model = it->model();
+			shaderNT.setMat4f(model, "model");
+			//dirL.apply(shaderNT);
+			poiL.apply(shaderNT);
+			spoL.apply(shaderNT);
+			glUniform1i(glGetUniformLocation(shaderNT.getID(), "numOfSpotLights"), isSpotLightOn);
+
+			glDisable(GL_CULL_FACE);
+			shaderTanSp.use();
+			shaderTanSp.setMat4f(CameraMatrix.view, "view");
+			shaderTanSp.setMat4f(CameraMatrix.projection, "projection");
+			shaderTanSp.setMat4f(model, "model");
+			//P51.draw(shaderTanSp, shaderTanSp);
+
+			glEnable(GL_CULL_FACE);
+			shaderT.use();
+			shaderT.setMat4f(CameraMatrix.view, "view");
+			shaderT.setMat4f(CameraMatrix.projection, "projection");
+			shaderT.setMat4f(model, "model");
+			//dirL.apply(shaderT);
+			poiL.apply(shaderT);
+			spoL.apply(shaderT);
+			glUniform1i(glGetUniformLocation(shaderT.getID(), "numOfSpotLights"), isSpotLightOn);
+			//P51.draw(shaderT,shaderNT);
+
+			lightShader.use();
+			glm::mat4 lightModel(1.0f);
+			lightModel = glm::translate(lightModel, pointPos);
+			lightModel = glm::scale(lightModel, glm::vec3(0.01f, 0.01f, 0.01f));
+			lightShader.setMat4f(CameraMatrix.view, "view");
+			lightShader.setMat4f(CameraMatrix.projection, "projection");
+			lightShader.setMat4f(lightModel, "model");
+			P51.draw(lightShader, lightShader);
+		}
+
+		for (const auto &it : ammunitions.ammunitions) {
 			shaderNT.use();
 			shaderNT.setVec3f(camera.getPosition(), "ViewPosition");
 			shaderNT.setMat4f(CameraMatrix.view, "view");
@@ -331,4 +378,8 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos)
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
 	camera.processMouseScroll(yOffset);
+}
+void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		ammunitions.processMouse(&myfighter);
 }

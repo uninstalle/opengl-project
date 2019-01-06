@@ -68,7 +68,7 @@ public:
 	//void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
 	//void processMouseScroll(float yOffset);
 	glm::mat4 model();
-
+	glm::mat4 getRealFront() const;
 	int mode;
 };
 
@@ -82,8 +82,4 @@ public:
 	}
 	void update();
 };
-
-
-void synchronizeMovementSpeed();
-
 #endif

@@ -43,4 +43,5 @@ public:
 	void setFighter(Fighter* fighter) {
 		this->fighter = fighter;
 	}
+	void update();
 };
